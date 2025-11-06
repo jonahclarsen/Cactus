@@ -91,34 +91,71 @@ class TrayManager {
         if (!this.tray) return;
 
         const minutesLeft = this.timerManager.secondsToMinutesFloor(this.timerManager.timeRemainingSeconds());
-        this.renderTrayImage(0, minutesLeft, () => { });
+        this.renderTrayImage(minutesLeft, () => { });
 
-        // Only show the minutes as system text; colored balance + pie are in the image
+        // Only show the minutes as system text; heart timer is in the image
         try { this.tray.setTitle(`${minutesLeft}`); } catch { }
 
         this.tray.setToolTip(`Timer: ${minutesLeft} minutes remaining`);
     }
 
-    renderTrayImage(balanceNum, minutesLeft, cb) {
+    drawHeartPath(ctx, x, y, width, height) {
+        // Draw a heart shape using bezier curves
+        // The heart is centered at (x, y) with given width and height
+        const leftX = x - width / 2;
+        const rightX = x + width / 2;
+        const topY = y - height / 2;
+        const bottomY = y + height / 2;
+        const midY = y;
+        const heartTopY = topY + height * 0.15; // Top of the heart humps
+
+        ctx.beginPath();
+        // Start at bottom point (tip of heart)
+        ctx.moveTo(x, bottomY);
+
+        // Left curve: bottom to left hump
+        ctx.bezierCurveTo(
+            leftX + width * 0.25, bottomY - height * 0.1,
+            leftX, midY,
+            leftX + width * 0.1, heartTopY
+        );
+
+        // Left hump to center top
+        ctx.bezierCurveTo(
+            leftX + width * 0.15, topY + height * 0.05,
+            x - width * 0.05, topY + height * 0.1,
+            x, heartTopY
+        );
+
+        // Center top to right hump
+        ctx.bezierCurveTo(
+            x + width * 0.05, topY + height * 0.1,
+            rightX - width * 0.15, topY + height * 0.05,
+            rightX - width * 0.1, heartTopY
+        );
+
+        // Right hump to bottom
+        ctx.bezierCurveTo(
+            rightX, midY,
+            rightX - width * 0.25, bottomY - height * 0.1,
+            x, bottomY
+        );
+
+        ctx.closePath();
+    }
+
+    renderTrayImage(minutesLeft, cb) {
         try {
             // Render at 2x for HiDPI displays
             const scale = 2;
             const pointH = 26;
 
-            // Calculate dynamic width based on content
-            const balanceText = String(balanceNum);
-            const fontSize = 15 * scale;
-            const pieSize = 18 * scale;
-            const spaceBetween = 8;
-
-            // Estimate text width (approximate: 0.6 * fontSize per character for bold font)
-            const estimatedTextWidth = balanceText.length * fontSize * 0.6;
-            const totalContentWidth = estimatedTextWidth + spaceBetween + pieSize;
+            // Calculate width based on heart size
+            const heartSize = 18 * scale;
             const minWidth = 32 * scale;
-            const w = Math.max(minWidth, Math.ceil(totalContentWidth + 8));
+            const w = Math.max(minWidth, Math.ceil(heartSize + 8));
             const pointW = Math.ceil(w / scale);
             const h = pointH * scale;
-            const padding = 0 * scale;
 
             // Create canvas
             const canvas = createCanvas(w, h);
@@ -126,53 +163,48 @@ class TrayManager {
 
             // Clear and setup
             ctx.clearRect(0, 0, w, h);
-            ctx.imageSmoothingEnabled = false;
+            ctx.imageSmoothingEnabled = true; // Enable smoothing for heart shape
 
             // Determine colors - use theme from settings
             const themeName = this.settings.theme || 'neutral';
             const theme = THEME_PALETTES[themeName] || THEME_PALETTES.neutral;
-            const balanceColor = THEME_PALETTES.neutral.primary;
-            const pieColor = theme.primary;
+            const heartColor = theme.primary;
 
-            // Calculate timer progress
+            // Calculate timer progress (frac is how much has elapsed, 0 to 1)
             const total = this.state.timer.initialSeconds || (this.state.timer.isBreak ?
                 (this.settings.durations.breakMinutes) * 60 :
                 (this.settings.durations.workMinutes) * 60);
             const rem = Math.max(0, this.timerManager.timeRemainingSeconds());
             const frac = total > 0 ? Math.max(0, Math.min(1, 1 - rem / total)) : 0;
 
-            // Draw balance number
-            ctx.font = `bold ${fontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, Helvetica, sans-serif`;
-            ctx.textBaseline = 'middle';
-            ctx.textAlign = 'left';
-            ctx.fillStyle = balanceColor;
-            const tx = padding;
-            const ty = h / 2;
-            ctx.fillText(balanceText, tx, ty);
-            const tm = Math.ceil(ctx.measureText(balanceText).width);
-
-            // Draw pie timer
-            const cx = tx + tm + pieSize / 2 + spaceBetween;
+            // Heart dimensions
+            const heartWidth = heartSize;
+            const heartHeight = heartSize;
+            const cx = w / 2;
             const cy = h / 2;
 
-            // Outer circle
-            ctx.strokeStyle = pieColor;
-            ctx.lineWidth = Math.max(1, Math.round(0.9 * scale));
-            ctx.beginPath();
-            ctx.arc(cx, cy, pieSize / 2, 0, Math.PI * 2);
-            ctx.stroke();
+            // Fill heart from bottom to top based on progress
+            if (frac > 0) {
+                // Save context to apply clipping
+                ctx.save();
 
-            // Filled wedge (clockwise from top)
-            const start = -Math.PI / 2;
-            const end = start + Math.PI * 2 * frac;
-            ctx.beginPath();
-            ctx.moveTo(cx, cy);
-            ctx.fillStyle = pieColor;
-            ctx.arc(cx, cy, pieSize / 2 - Math.max(1, Math.round(0.8 * scale)), start, end);
-            ctx.closePath();
-            ctx.globalAlpha = 0.6;
-            ctx.fill();
-            ctx.globalAlpha = 1;
+                // Draw the heart path again for clipping
+                this.drawHeartPath(ctx, cx, cy, heartWidth, heartHeight);
+                ctx.clip();
+
+                // Calculate fill height (from bottom)
+                const fillHeight = heartHeight * frac;
+                const fillY = cy + heartHeight / 2 - fillHeight;
+
+                // Fill from bottom to the calculated height
+                ctx.fillStyle = heartColor;
+                ctx.globalAlpha = 0.8;
+                ctx.fillRect(cx - heartWidth / 2, fillY, heartWidth, fillHeight);
+
+                // Restore context
+                ctx.restore();
+                ctx.globalAlpha = 1;
+            }
 
             // Convert to image buffer and create nativeImage
             const buffer = canvas.toBuffer('image/png');
