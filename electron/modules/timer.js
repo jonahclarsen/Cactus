@@ -1,8 +1,9 @@
 const { app } = require('electron');
 
 class TimerManager {
-    constructor(stateManager) {
+    constructor(stateManager, soundPlayer = null) {
         this.stateManager = stateManager;
+        this.soundPlayer = soundPlayer;
         this.tickInterval = null;
         this.minuteTrackingInterval = null;
         this.onTick = null; // Callback when timer updates
@@ -76,7 +77,12 @@ class TimerManager {
                         ts: Date.now()
                     };
                     if (this.onEnd) this.onEnd();
-                    try { app.beep(); } catch { }
+                    // Play sound using sound player if available, otherwise fall back to beep
+                    if (this.soundPlayer) {
+                        this.soundPlayer.playTimerEndSound();
+                    } else {
+                        try { app.beep(); } catch { }
+                    }
                     // Flush to disk soon after end
                     setTimeout(() => this.stateManager.saveData(), 250);
                 }

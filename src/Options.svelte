@@ -67,6 +67,21 @@
             </div>
         </div>
 
+        <!-- Sound Settings -->
+        <div class="section">
+            <h3>Sound Settings</h3>
+            <div class="field">
+                <label>Timer end sound volume: {editingSettings.soundVolume || 100}%</label>
+                <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    step="1"
+                    bind:value={editingSettings.soundVolume}
+                />
+            </div>
+        </div>
+
         <!-- Actions -->
         <div class="controls">
             <button
@@ -151,9 +166,38 @@
         box-sizing: border-box;
         font-size: 14px;
     }
+    input[type="range"] {
+        padding: 0;
+        height: 8px;
+        background: transparent;
+        cursor: pointer;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+        appearance: none;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: var(--accent);
+        border: 2px solid var(--stroke);
+        cursor: pointer;
+    }
+    input[type="range"]::-moz-range-thumb {
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: var(--accent);
+        border: 2px solid var(--stroke);
+        cursor: pointer;
+    }
     input:disabled {
         background: #f5f5f5;
         color: #999;
+    }
+    label {
+        display: block;
+        margin-bottom: 4px;
+        font-size: 13px;
+        color: var(--stroke);
     }
     .controls {
         display: flex;

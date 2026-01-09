@@ -6,6 +6,7 @@ const DEFAULT_SETTINGS = {
     theme: 'neutral',
     acceptableHourRange: 6,
     durations: { workMinutes: 30, breakMinutes: 3 },
+    soundVolume: 100, // Volume for timer end sound (0-100)
 };
 
 const DEFAULT_STATE = {
@@ -77,8 +78,17 @@ class StateManager {
             this.dataFilePath = p;
             if (fs.existsSync(p)) {
                 const json = JSON.parse(fs.readFileSync(p, 'utf-8'));
-                this.settings = json.settings;
-                this.state = json.state;
+                // Deep merge with defaults to ensure new settings are added
+                this.settings = {
+                    ...DEFAULT_SETTINGS,
+                    ...json.settings,
+                    durations: { ...DEFAULT_SETTINGS.durations, ...(json.settings?.durations || {}) }
+                };
+                this.state = {
+                    ...DEFAULT_STATE,
+                    ...json.state,
+                    timer: { ...DEFAULT_STATE.timer, ...(json.state?.timer || {}) }
+                };
             } else {
                 this.saveData();
             }

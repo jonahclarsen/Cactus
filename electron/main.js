@@ -4,6 +4,7 @@ const { StateManager } = require('./modules/state');
 const { TimerManager } = require('./modules/timer');
 const { WindowManager } = require('./modules/window');
 const { TrayManager } = require('./modules/tray');
+const { SoundPlayer } = require('./modules/sound');
 const { setupIpcHandlers } = require('./modules/ipc-handlers');
 
 const isDev = !app.isPackaged;
@@ -11,8 +12,9 @@ const DEV_PORT = process.env.VITE_DEV_PORT || '5173';
 
 // Initialize managers
 const stateManager = new StateManager();
-const timerManager = new TimerManager(stateManager);
 const windowManager = new WindowManager(isDev, DEV_PORT);
+const soundPlayer = new SoundPlayer(windowManager, stateManager);
+const timerManager = new TimerManager(stateManager, soundPlayer);
 const trayManager = new TrayManager(timerManager, windowManager);
 
 app.whenReady().then(() => {
