@@ -28,7 +28,7 @@ function setupIpcHandlers(stateManager, timerManager, windowManager, trayManager
 
     timerManager.onEnd = () => {
         notifyRenderer('timer-ended');
-        windowManager.showWindowNearTray();
+        // windowManager.showWindowNearTray();
     };
 
     // Register IPC handlers
