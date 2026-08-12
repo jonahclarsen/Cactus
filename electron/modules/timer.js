@@ -1,4 +1,4 @@
-const { app } = require('electron');
+const { shell } = require('electron');
 
 class TimerManager {
     constructor(stateManager, soundPlayer = null) {
@@ -81,7 +81,7 @@ class TimerManager {
                     if (this.soundPlayer) {
                         this.soundPlayer.playTimerEndSound();
                     } else {
-                        try { app.beep(); } catch { }
+                        try { shell.beep(); } catch { }
                     }
                     // Flush to disk soon after end
                     setTimeout(() => this.stateManager.saveData(), 250);
@@ -172,4 +172,3 @@ class TimerManager {
 }
 
 module.exports = { TimerManager };
-

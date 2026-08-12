@@ -71,7 +71,7 @@
         <div class="section">
             <h3>Sound Settings</h3>
             <div class="field">
-                <label>Timer end sound volume: {editingSettings.soundVolume || 100}%</label>
+                <label>Timer end sound volume: {editingSettings.soundVolume ?? 100}%</label>
                 <input
                     type="range"
                     min="0"

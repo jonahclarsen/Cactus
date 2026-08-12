@@ -28,11 +28,6 @@
             applyIncoming(payload);
             if (type === "timer-ended") {
                 hasEnded = true;
-                new Audio(
-                    "data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABYBHQAA",
-                )
-                    .play()
-                    .catch(() => {});
             }
         });
         return () => unsub && unsub();

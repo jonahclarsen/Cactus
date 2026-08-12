@@ -1,6 +1,7 @@
-const { app } = require('electron');
+const { app, shell } = require('electron');
 const path = require('path');
 const fs = require('fs');
+const { pathToFileURL } = require('url');
 
 /**
  * Sound player module for playing timer end sound
@@ -45,7 +46,7 @@ class SoundPlayer {
 
     /**
      * Play the timer end sound
-     * Falls back to app.beep() if sound file doesn't exist or playback fails
+     * Falls back to Electron's system beep if the sound is unavailable
      */
     playTimerEndSound() {
         const soundPath = this.getSoundFilePath();
@@ -54,7 +55,7 @@ class SoundPlayer {
         if (!fs.existsSync(soundPath)) {
             console.log('Sound file not found, falling back to beep:', soundPath);
             try {
-                app.beep();
+                shell.beep();
             } catch (e) {
                 console.error('Failed to play beep:', e);
             }
@@ -67,15 +68,15 @@ class SoundPlayer {
         if (!mainWindow || !mainWindow.webContents) {
             console.log('Window not available, falling back to beep');
             try {
-                app.beep();
+                shell.beep();
             } catch (e) {
                 console.error('Failed to play beep:', e);
             }
             return;
         }
 
-        // Convert path to file:// URL for webContents
-        const soundUrl = `file://${soundPath}`;
+        // Use a properly encoded file URL so installed paths containing spaces work.
+        const soundUrl = pathToFileURL(soundPath).href;
         
         // Get volume from settings (0-100, convert to 0-1)
         const volumeSetting = this.stateManager && this.stateManager.settings 
@@ -85,33 +86,37 @@ class SoundPlayer {
         
         console.log('Playing sound with volume:', volumeSetting, '% (', volume, ')');
         
-        // Play sound using webContents.executeJavaScript
-        // This uses HTML5 Audio API in the renderer process
+        // Keep the element reachable until playback ends. Returning the play promise
+        // also lets executeJavaScript report media errors to the main process.
         mainWindow.webContents.executeJavaScript(`
-            (function() {
+            (async function() {
                 try {
                     const audio = new Audio(${JSON.stringify(soundUrl)});
                     audio.volume = ${volume};
-                    audio.play().catch(function(err) {
-                        console.error('Failed to play sound:', err);
-                        // Fallback to beep if audio play fails
-                        if (window.electron && window.electron.beep) {
-                            window.electron.beep();
+                    window.__cactusTimerEndAudio = audio;
+                    audio.addEventListener('ended', function() {
+                        if (window.__cactusTimerEndAudio === audio) {
+                            window.__cactusTimerEndAudio = null;
                         }
-                    });
+                    }, { once: true });
+                    await audio.play();
+                    return { ok: true };
                 } catch (err) {
-                    console.error('Error creating audio:', err);
-                    // Fallback to beep
-                    if (window.electron && window.electron.beep) {
-                        window.electron.beep();
-                    }
+                    window.__cactusTimerEndAudio = null;
+                    return {
+                        ok: false,
+                        error: err && err.message ? err.message : String(err),
+                    };
                 }
             })();
-        `).catch((err) => {
-            console.error('Failed to execute sound playback script:', err);
-            // Fallback to beep
+        `, true).then((result) => {
+            if (!result || !result.ok) {
+                throw new Error(result && result.error ? result.error : 'Unknown media playback error');
+            }
+        }).catch((err) => {
+            console.error('Failed to play timer end sound, falling back to beep:', err);
             try {
-                app.beep();
+                shell.beep();
             } catch (e) {
                 console.error('Failed to play beep:', e);
             }
