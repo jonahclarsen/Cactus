@@ -1,0 +1,3 @@
+After every change, commit and push it. But watch out for changes that have been being worked on in parallel; keep the commit clean and separate.
+
+This is a public repo, so make sure to not commit and push any secrets.
