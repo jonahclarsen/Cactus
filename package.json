@@ -8,13 +8,13 @@
     "type": "commonjs",
     "scripts": {
         "dev": "run-p dev:renderer dev:electron",
-        "dev:renderer": "VITE_DEV_PORT=5679 vite --port 5679",
-        "dev:electron": "wait-on tcp:5679 && VITE_DEV_PORT=5679 electron .",
+        "dev:renderer": "VITE_DEV_PORT=5677 vite --port 5677",
+        "dev:electron": "wait-on tcp:5677 && VITE_DEV_PORT=5677 electron .",
         "build": "run-s build:renderer build:electron",
         "build:renderer": "NODE_ENV=production vite build",
-        "build:electron": "NODE_ENV=production electron-builder",
+        "build:electron": "NODE_ENV=production electron-builder --mac --arm64 --dir -c.mac.identity=- -c.mac.hardenedRuntime=false -c.electronDist=node_modules/electron/dist",
         "build:mac": "run-s build:renderer && NODE_ENV=production electron-builder --mac",
-        "build:mac-local": "run-s build:renderer && NODE_ENV=production electron-builder --mac --dir -c.mac.identity=null",
+        "build:mac-local": "run-s build:renderer && NODE_ENV=production electron-builder --mac --arm64 --dir -c.mac.identity=- -c.mac.hardenedRuntime=false -c.electronDist=node_modules/electron/dist",
         "build:win": "run-s build:renderer && NODE_ENV=production electron-builder --win",
         "build:linux": "run-s build:renderer && NODE_ENV=production electron-builder --linux",
         "build:all": "run-s build:renderer && NODE_ENV=production electron-builder --mac --win --linux",
@@ -25,8 +25,9 @@
     },
     "devDependencies": {
         "@sveltejs/vite-plugin-svelte": "^3.1.1",
-        "electron": "^31.3.1",
-        "electron-builder": "^26.0.12",
+        "electron": "^43.4.0",
+        "electron-builder": "^26.15.3",
+        "electron-builder-squirrel-windows": "26.15.3",
         "npm-run-all": "^4.1.5",
         "svelte": "^4.2.18",
         "vite": "^5.3.3",
@@ -88,7 +89,7 @@
         }
     },
     "pnpm": {
-        "ignoredBuiltDependencies": [
+        "onlyBuiltDependencies": [
             "electron",
             "esbuild"
         ]
