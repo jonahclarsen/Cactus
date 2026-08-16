@@ -2,6 +2,7 @@ const { Tray, nativeImage } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const { createCanvas } = require('@napi-rs/canvas');
+const { drawTraySymbolPath } = require('./tray-symbols');
 
 const THEME_PALETTES = {
     pink: {
@@ -93,55 +94,10 @@ class TrayManager {
         const minutesLeft = this.timerManager.secondsToMinutesFloor(this.timerManager.timeRemainingSeconds());
         this.renderTrayImage(minutesLeft, () => { });
 
-        // Only show the minutes as system text; heart timer is in the image
+        // Only show the minutes as system text; timer progress is in the symbol.
         try { this.tray.setTitle(`${minutesLeft}`); } catch { }
 
         this.tray.setToolTip(`Timer: ${minutesLeft} minutes remaining`);
-    }
-
-    drawHeartPath(ctx, x, y, width, height) {
-        // Draw a heart shape using bezier curves
-        // The heart is centered at (x, y) with given width and height
-        const leftX = x - width / 2;
-        const rightX = x + width / 2;
-        const topY = y - height / 2;
-        const bottomY = y + height / 2;
-        const midY = y;
-        const heartTopY = topY + height * 0.15; // Top of the heart humps
-
-        ctx.beginPath();
-        // Start at bottom point (tip of heart)
-        ctx.moveTo(x, bottomY);
-
-        // Left curve: bottom to left hump
-        ctx.bezierCurveTo(
-            leftX + width * 0.25, bottomY - height * 0.1,
-            leftX, midY,
-            leftX + width * 0.1, heartTopY
-        );
-
-        // Left hump to center top
-        ctx.bezierCurveTo(
-            leftX + width * 0.15, topY + height * 0.05,
-            x - width * 0.05, topY + height * 0.1,
-            x, heartTopY
-        );
-
-        // Center top to right hump
-        ctx.bezierCurveTo(
-            x + width * 0.05, topY + height * 0.1,
-            rightX - width * 0.15, topY + height * 0.05,
-            rightX - width * 0.1, heartTopY
-        );
-
-        // Right hump to bottom
-        ctx.bezierCurveTo(
-            rightX, midY,
-            rightX - width * 0.25, bottomY - height * 0.1,
-            x, bottomY
-        );
-
-        ctx.closePath();
     }
 
     renderTrayImage(minutesLeft, cb) {
@@ -150,10 +106,9 @@ class TrayManager {
             const scale = 2;
             const pointH = 26;
 
-            // Calculate width based on heart size
-            const heartSize = 18 * scale;
+            const symbolSize = 18 * scale;
             const minWidth = 32 * scale;
-            const w = Math.max(minWidth, Math.ceil(heartSize + 8));
+            const w = Math.max(minWidth, Math.ceil(symbolSize + 8));
             const pointW = Math.ceil(w / scale);
             const h = pointH * scale;
 
@@ -163,12 +118,13 @@ class TrayManager {
 
             // Clear and setup
             ctx.clearRect(0, 0, w, h);
-            ctx.imageSmoothingEnabled = true; // Enable smoothing for heart shape
+            ctx.imageSmoothingEnabled = true;
 
             // Determine colors - use theme from settings
             const themeName = this.settings.theme || 'neutral';
             const theme = THEME_PALETTES[themeName] || THEME_PALETTES.neutral;
-            const heartColor = theme.primary;
+            const symbolColor = theme.primary;
+            const symbol = this.settings.traySymbol === 'heart' ? 'heart' : 'cactus';
 
             // Calculate timer progress (frac is how much has elapsed, 0 to 1)
             const total = this.state.timer.initialSeconds || (this.state.timer.isBreak ?
@@ -177,29 +133,32 @@ class TrayManager {
             const rem = Math.max(0, this.timerManager.timeRemainingSeconds());
             const frac = total > 0 ? Math.max(0, Math.min(1, 1 - rem / total)) : 0;
 
-            // Heart dimensions
-            const heartWidth = heartSize;
-            const heartHeight = heartSize;
             const cx = w / 2;
             const cy = h / 2;
 
-            // Fill heart from bottom to top based on progress
+            // Keep the complete silhouette visible while progress fills it in.
+            drawTraySymbolPath(ctx, symbol, cx, cy, symbolSize, symbolSize);
+            ctx.fillStyle = symbolColor;
+            ctx.globalAlpha = 0.22;
+            ctx.fill();
+            ctx.globalAlpha = 1;
+
+            // Fill the selected symbol from bottom to top based on progress.
             if (frac > 0) {
                 // Save context to apply clipping
                 ctx.save();
 
-                // Draw the heart path again for clipping
-                this.drawHeartPath(ctx, cx, cy, heartWidth, heartHeight);
+                drawTraySymbolPath(ctx, symbol, cx, cy, symbolSize, symbolSize);
                 ctx.clip();
 
                 // Calculate fill height (from bottom)
-                const fillHeight = heartHeight * frac;
-                const fillY = cy + heartHeight / 2 - fillHeight;
+                const fillHeight = symbolSize * frac;
+                const fillY = cy + symbolSize / 2 - fillHeight;
 
                 // Fill from bottom to the calculated height
-                ctx.fillStyle = heartColor;
+                ctx.fillStyle = symbolColor;
                 ctx.globalAlpha = 0.8;
-                ctx.fillRect(cx - heartWidth / 2, fillY, heartWidth, fillHeight);
+                ctx.fillRect(cx - symbolSize / 2, fillY, symbolSize, fillHeight);
 
                 // Restore context
                 ctx.restore();
@@ -226,4 +185,3 @@ class TrayManager {
 }
 
 module.exports = { TrayManager };
-

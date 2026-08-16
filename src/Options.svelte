@@ -44,6 +44,18 @@
             </div>
         </div>
 
+        <!-- Tray Symbol -->
+        <div class="section">
+            <h3>Menu Bar Symbol</h3>
+            <div class="field">
+                <label for="tray-symbol">Progress shape</label>
+                <select id="tray-symbol" bind:value={editingSettings.traySymbol}>
+                    <option value="cactus">Cactus</option>
+                    <option value="heart">Heart</option>
+                </select>
+            </div>
+        </div>
+
         <!-- Timer Settings -->
         <div class="section">
             <h3>Timer Settings</h3>

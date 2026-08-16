@@ -4,6 +4,7 @@ const fs = require('fs');
 
 const DEFAULT_SETTINGS = {
     theme: 'neutral',
+    traySymbol: 'cactus',
     acceptableHourRange: 6,
     durations: { workMinutes: 30, breakMinutes: 3 },
     soundVolume: 100, // Volume for timer end sound (0-100)
@@ -139,4 +140,3 @@ class StateManager {
 }
 
 module.exports = { StateManager, DEFAULT_SETTINGS };
-

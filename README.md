@@ -16,6 +16,7 @@ I created this app because I couldn't find a Pomodoro solution I really liked - 
 
 ### ⚙️ Customization
 - Choose from multiple color themes
+- Choose a cactus or heart-shaped menu bar progress symbol
 - Adjust work and break durations
 - Keyboard shortcuts (press 'o' for options)
 
@@ -63,6 +64,7 @@ Use the `+` and `-` buttons with modifiers:
 
 Press `o` or click "Options" to access settings:
 - Select color theme
+- Select a cactus or heart menu bar symbol
 - Set work/break durations
 - Open data folder
 
