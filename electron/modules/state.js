@@ -3,12 +3,38 @@ const path = require('path');
 const fs = require('fs');
 
 const DEFAULT_SETTINGS = {
-    theme: 'neutral',
+    theme: 'violet',
     traySymbol: 'cactus',
     acceptableHourRange: 6,
     durations: { workMinutes: 30, breakMinutes: 3 },
     soundVolume: 100, // Volume for timer end sound (0-100)
 };
+
+const LEGACY_THEME_ALIASES = {
+    purple: 'violet',
+    green: 'forest',
+    blue: 'ocean',
+    orange: 'sunset',
+    neutral: 'graphite',
+};
+
+const THEME_KEYS = new Set([
+    'violet',
+    'forest',
+    'ocean',
+    'sunset',
+    'berry',
+    'pink',
+    'mint',
+    'midnight',
+    'graphite',
+    'iridescent',
+]);
+
+function normalizeThemeKey(themeKey) {
+    const normalized = LEGACY_THEME_ALIASES[themeKey] || themeKey;
+    return THEME_KEYS.has(normalized) ? normalized : DEFAULT_SETTINGS.theme;
+}
 
 const DEFAULT_STATE = {
     timer: { running: false, isBreak: false, remainingSeconds: 0, endTs: 0, initialSeconds: 0 },
@@ -83,6 +109,7 @@ class StateManager {
                 this.settings = {
                     ...DEFAULT_SETTINGS,
                     ...json.settings,
+                    theme: normalizeThemeKey(json.settings?.theme),
                     durations: { ...DEFAULT_SETTINGS.durations, ...(json.settings?.durations || {}) }
                 };
                 this.state = {
@@ -125,7 +152,11 @@ class StateManager {
 
     updateSettings(nextSettings) {
         const prevDir = this.getUserDir();
-        this.settings = { ...this.settings, ...nextSettings };
+        this.settings = {
+            ...this.settings,
+            ...nextSettings,
+            theme: normalizeThemeKey(nextSettings.theme ?? this.settings.theme),
+        };
 
         const newDir = this.getUserDir();
         if (newDir !== prevDir) {

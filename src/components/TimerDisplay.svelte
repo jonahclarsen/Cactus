@@ -21,7 +21,7 @@
         font-weight: 900;
         text-align: center;
         letter-spacing: 2px;
-        text-shadow: 1px 1px #ffffff;
+        text-shadow: 0 1px 0 var(--surface);
         margin-top: 5px;
     }
 </style>

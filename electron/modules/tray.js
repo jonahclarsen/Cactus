@@ -4,49 +4,17 @@ const fs = require('fs');
 const { createCanvas } = require('@napi-rs/canvas');
 const { drawTraySymbolPath } = require('./tray-symbols');
 
-const THEME_PALETTES = {
-    pink: {
-        bg: "#FFE2F5",
-        card: "#FDB3DB",
-        stroke: "#BF6091",
-        accent: "#E47ED1",
-        primary: "#e91e63"
-    },
-    green: {
-        bg: "#E0F2F1",
-        card: "#B2DFDB",
-        stroke: "#00695C",
-        accent: "#4DB6AC",
-        primary: "#2e7d32"
-    },
-    neutral: {
-        bg: "#F3F3F3",
-        card: "#E8E8E8",
-        stroke: "#9E9E9E",
-        accent: "#BDBDBD",
-        primary: "#8C8C8C"
-    },
-    blue: {
-        bg: "#E3F2FD",
-        card: "#90CAF9",
-        stroke: "#1565C0",
-        accent: "#42A5F5",
-        primary: "#1976D2"
-    },
-    purple: {
-        bg: "#F3E5F5",
-        card: "#CE93D8",
-        stroke: "#6A1B9A",
-        accent: "#AB47BC",
-        primary: "#8E24AA"
-    },
-    orange: {
-        bg: "#FFF3E0",
-        card: "#FFCC80",
-        stroke: "#E65100",
-        accent: "#FF9800",
-        primary: "#F57C00"
-    }
+const THEME_PRIMARY_COLORS = {
+    violet: '#8a63b8',
+    forest: '#3f9d54',
+    ocean: '#278b9f',
+    sunset: '#c77832',
+    berry: '#b45672',
+    pink: '#e16491',
+    mint: '#42a878',
+    midnight: '#596fbb',
+    graphite: '#777774',
+    iridescent: '#28a987',
 };
 
 class TrayManager {
@@ -121,9 +89,7 @@ class TrayManager {
             ctx.imageSmoothingEnabled = true;
 
             // Determine colors - use theme from settings
-            const themeName = this.settings.theme || 'neutral';
-            const theme = THEME_PALETTES[themeName] || THEME_PALETTES.neutral;
-            const symbolColor = theme.primary;
+            const symbolColor = THEME_PRIMARY_COLORS[this.settings.theme] || THEME_PRIMARY_COLORS.violet;
             const symbol = this.settings.traySymbol === 'heart' ? 'heart' : 'cactus';
 
             // Calculate timer progress (frac is how much has elapsed, 0 to 1)

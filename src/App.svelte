@@ -3,7 +3,7 @@
     import Options from "./Options.svelte";
     import TimerDisplay from "./components/TimerDisplay.svelte";
     import TimerControls from "./components/TimerControls.svelte";
-    import { THEME_PALETTES } from "./themes.js";
+    import { THEME_PALETTES, normalizeThemeKey } from "./themes.js";
     import "./button.css";
 
     const api = window.cactus;
@@ -53,18 +53,17 @@
         hasEnded = false;
     }
 
-    function computeTheme(settings, state) {
-        // Use theme from settings, default to neutral if not set
-        const themeName = settings?.theme || "neutral";
-        const theme = THEME_PALETTES[themeName] || THEME_PALETTES.neutral;
+    function computeTheme(settings) {
+        const themeName = normalizeThemeKey(settings?.theme);
+        const theme = THEME_PALETTES[themeName];
 
         return {
             ...theme,
-            gray: THEME_PALETTES.neutral.primary,
+            gray: theme.muted,
         };
     }
 
-    $: crayon = computeTheme(settings, state);
+    $: crayon = computeTheme(showOptions ? editingSettings : settings);
 </script>
 
 <svelte:window
@@ -91,7 +90,7 @@
 
 <div
     class="root"
-    style="--bg:{crayon.bg}; --card:{crayon.card}; --stroke:{crayon.stroke}; --accent:{crayon.accent}; --gray:{crayon.gray}"
+    style="--bg:{crayon.bg}; --card:{crayon.card}; --surface:{crayon.surface}; --stroke:{crayon.stroke}; --ink:{crayon.ink}; --muted:{crayon.muted}; --accent:{crayon.accent}; --gray:{crayon.gray}"
 >
     {#if settings && state}
         <div class="main-content">
@@ -167,7 +166,7 @@
             Cantarell,
             Noto Sans,
             sans-serif;
-        color: #2e2a24;
+        color: var(--ink);
         display: flex;
         flex-direction: column;
     }
