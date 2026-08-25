@@ -63,7 +63,7 @@ class TrayManager {
         this.renderTrayImage(minutesLeft, () => { });
 
         // Only show the minutes as system text; timer progress is in the symbol.
-        const trayTitle = minutesLeft === 0 ? '!' : String(minutesLeft);
+        const trayTitle = minutesLeft === 0 ? '❗' : String(minutesLeft);
         try { this.tray.setTitle(trayTitle); } catch { }
 
         this.tray.setToolTip(`Timer: ${minutesLeft} minutes remaining`);

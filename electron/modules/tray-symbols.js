@@ -56,23 +56,23 @@ function drawHeartPath(ctx, x, y, width, height) {
     ctx.beginPath();
     ctx.moveTo(x, bottomY);
     ctx.bezierCurveTo(
-        leftX + width * 0.25, bottomY - height * 0.1,
-        leftX, midY,
-        leftX + width * 0.1, heartTopY
+        leftX + width * 0.1, bottomY - height * 0.08,
+        leftX, midY + height * 0.08,
+        leftX + width * 0.06, heartTopY
     );
     ctx.bezierCurveTo(
-        leftX + width * 0.15, topY + height * 0.05,
+        leftX + width * 0.08, topY + height * 0.05,
         x - width * 0.05, topY + height * 0.1,
         x, cleftY
     );
     ctx.bezierCurveTo(
         x + width * 0.05, topY + height * 0.1,
-        rightX - width * 0.15, topY + height * 0.05,
-        rightX - width * 0.1, heartTopY
+        rightX - width * 0.08, topY + height * 0.05,
+        rightX - width * 0.06, heartTopY
     );
     ctx.bezierCurveTo(
-        rightX, midY,
-        rightX - width * 0.25, bottomY - height * 0.1,
+        rightX, midY + height * 0.08,
+        rightX - width * 0.1, bottomY - height * 0.08,
         x, bottomY
     );
     ctx.closePath();
