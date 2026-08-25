@@ -3,6 +3,9 @@ const path = require('path');
 const fs = require('fs');
 const { createCanvas } = require('@napi-rs/canvas');
 const { drawTraySymbolPath } = require('./tray-symbols');
+const ALERT_FONTS = require('../alert-fonts.json');
+
+const ALERT_FONT_FAMILIES = new Map(ALERT_FONTS.map((font) => [font.id, font.family]));
 
 const THEME_PRIMARY_COLORS = {
     violet: '#8a63b8',
@@ -143,20 +146,13 @@ class TrayManager {
 
             if (showZeroAlert) {
                 const alertX = cx + symbolSize / 2 + alertGap + alertWidth / 2;
-                const markerWidth = 6 * scale;
-                const stemHeight = 10 * scale;
-                const markerGap = 2 * scale;
-                const dotHeight = 4 * scale;
-                const markerHeight = stemHeight + markerGap + dotHeight;
-                const markerTop = cy - markerHeight / 2;
+                const alertFont = ALERT_FONT_FAMILIES.get(this.settings.completionAlertFont)
+                    || ALERT_FONT_FAMILIES.get('lucida-grande');
+                ctx.font = `900 ${20 * scale}px ${alertFont}`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
                 ctx.fillStyle = '#e34b4f';
-                ctx.fillRect(alertX - markerWidth / 2, markerTop, markerWidth, stemHeight);
-                ctx.fillRect(
-                    alertX - markerWidth / 2,
-                    markerTop + stemHeight + markerGap,
-                    markerWidth,
-                    dotHeight
-                );
+                ctx.fillText('!', alertX, cy);
             }
 
             // Convert to image buffer and create nativeImage

@@ -1,0 +1,52 @@
+[
+    {
+        "id": "lucida-grande",
+        "name": "Lucida Grande",
+        "family": "\"Lucida Grande\", sans-serif"
+    },
+    {
+        "id": "helvetica-neue",
+        "name": "Helvetica Neue",
+        "family": "\"Helvetica Neue\", Helvetica, Arial, sans-serif"
+    },
+    {
+        "id": "arial",
+        "name": "Arial",
+        "family": "Arial, sans-serif"
+    },
+    {
+        "id": "avenir-next",
+        "name": "Avenir Next",
+        "family": "\"Avenir Next\", Avenir, sans-serif"
+    },
+    {
+        "id": "futura",
+        "name": "Futura",
+        "family": "Futura, sans-serif"
+    },
+    {
+        "id": "gill-sans",
+        "name": "Gill Sans",
+        "family": "\"Gill Sans\", sans-serif"
+    },
+    {
+        "id": "optima",
+        "name": "Optima",
+        "family": "Optima, sans-serif"
+    },
+    {
+        "id": "trebuchet-ms",
+        "name": "Trebuchet MS",
+        "family": "\"Trebuchet MS\", sans-serif"
+    },
+    {
+        "id": "verdana",
+        "name": "Verdana",
+        "family": "Verdana, sans-serif"
+    },
+    {
+        "id": "geneva",
+        "name": "Geneva",
+        "family": "Geneva, sans-serif"
+    }
+]

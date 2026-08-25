@@ -1,10 +1,14 @@
 const { app } = require('electron');
 const path = require('path');
 const fs = require('fs');
+const ALERT_FONTS = require('../alert-fonts.json');
+
+const ALERT_FONT_KEYS = new Set(ALERT_FONTS.map((font) => font.id));
 
 const DEFAULT_SETTINGS = {
     theme: 'violet',
     traySymbol: 'cactus',
+    completionAlertFont: 'lucida-grande',
     acceptableHourRange: 6,
     durations: { workMinutes: 30, breakMinutes: 3 },
     soundVolume: 100, // Volume for timer end sound (0-100)
@@ -34,6 +38,10 @@ const THEME_KEYS = new Set([
 function normalizeThemeKey(themeKey) {
     const normalized = LEGACY_THEME_ALIASES[themeKey] || themeKey;
     return THEME_KEYS.has(normalized) ? normalized : DEFAULT_SETTINGS.theme;
+}
+
+function normalizeAlertFont(fontKey) {
+    return ALERT_FONT_KEYS.has(fontKey) ? fontKey : DEFAULT_SETTINGS.completionAlertFont;
 }
 
 const DEFAULT_STATE = {
@@ -110,6 +118,7 @@ class StateManager {
                     ...DEFAULT_SETTINGS,
                     ...json.settings,
                     theme: normalizeThemeKey(json.settings?.theme),
+                    completionAlertFont: normalizeAlertFont(json.settings?.completionAlertFont),
                     durations: { ...DEFAULT_SETTINGS.durations, ...(json.settings?.durations || {}) }
                 };
                 this.state = {
@@ -156,6 +165,9 @@ class StateManager {
             ...this.settings,
             ...nextSettings,
             theme: normalizeThemeKey(nextSettings.theme ?? this.settings.theme),
+            completionAlertFont: normalizeAlertFont(
+                nextSettings.completionAlertFont ?? this.settings.completionAlertFont
+            ),
         };
 
         const newDir = this.getUserDir();

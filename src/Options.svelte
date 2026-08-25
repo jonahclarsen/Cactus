@@ -1,6 +1,7 @@
 <script>
     import { createEventDispatcher } from "svelte";
     import { THEME_PALETTES, normalizeThemeKey } from "./themes.js";
+    import ALERT_FONTS from "../electron/alert-fonts.json";
     import "./button.css";
 
     export let editingSettings;
@@ -22,6 +23,11 @@
 
     function chooseTraySymbol(traySymbol) {
         editingSettings = { ...editingSettings, traySymbol };
+        persistOptions();
+    }
+
+    function chooseCompletionAlertFont(completionAlertFont) {
+        editingSettings = { ...editingSettings, completionAlertFont };
         persistOptions();
     }
 
@@ -59,6 +65,11 @@
     }
 
     $: activeTheme = normalizeThemeKey(editingSettings.theme);
+    $: activeAlertFont = ALERT_FONTS.some(
+        (font) => font.id === editingSettings.completionAlertFont,
+    )
+        ? editingSettings.completionAlertFont
+        : "lucida-grande";
 </script>
 
 <div class="options root">
@@ -112,6 +123,29 @@
                     <span class="choice-icon heart" aria-hidden="true">♥</span>
                     Heart
                 </button>
+            </div>
+        </div>
+
+        <div class="section">
+            <h3>Completion Alert Font</h3>
+            <div class="font-grid" role="group" aria-label="Completion alert font">
+                {#each ALERT_FONTS as font}
+                    <button
+                        type="button"
+                        class="font-option"
+                        class:active={activeAlertFont === font.id}
+                        aria-pressed={activeAlertFont === font.id}
+                        on:click={() => chooseCompletionAlertFont(font.id)}
+                    >
+                        <span
+                            class="font-preview"
+                            style={`font-family: ${font.family}`}
+                            aria-hidden="true"
+                        >!</span>
+                        <span class="font-name">{font.name}</span>
+                        <span class="selected-mark" aria-hidden="true">✓</span>
+                    </button>
+                {/each}
             </div>
         </div>
 
@@ -219,14 +253,16 @@
     }
 
     .theme-grid,
-    .choice-grid {
+    .choice-grid,
+    .font-grid {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 7px;
     }
 
     .theme-option,
-    .choice-option {
+    .choice-option,
+    .font-option {
         position: relative;
         min-width: 0;
         border: 2px solid var(--stroke);
@@ -238,19 +274,22 @@
     }
 
     .theme-option:hover,
-    .choice-option:hover {
+    .choice-option:hover,
+    .font-option:hover {
         border-color: color-mix(in srgb, var(--accent) 55%, var(--stroke));
         background: color-mix(in srgb, var(--surface) 94%, var(--accent));
     }
 
     .theme-option:focus-visible,
-    .choice-option:focus-visible {
+    .choice-option:focus-visible,
+    .font-option:focus-visible {
         outline: 3px solid color-mix(in srgb, var(--accent) 28%, transparent);
         outline-offset: 1px;
     }
 
     .theme-option.active,
-    .choice-option.active {
+    .choice-option.active,
+    .font-option.active {
         border-color: var(--accent);
         background: color-mix(in srgb, var(--surface) 88%, var(--accent));
         box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 16%, transparent);
@@ -311,7 +350,8 @@
         transition: opacity 140ms ease, transform 140ms ease;
     }
 
-    .theme-option.active .selected-mark {
+    .theme-option.active .selected-mark,
+    .font-option.active .selected-mark {
         opacity: 1;
         transform: scale(1);
     }
@@ -335,6 +375,34 @@
 
     .choice-icon.heart {
         color: var(--accent);
+    }
+
+    .font-option {
+        position: relative;
+        display: grid;
+        grid-template-columns: 28px minmax(0, 1fr);
+        align-items: center;
+        gap: 6px;
+        min-height: 43px;
+        padding: 6px 8px;
+        border-radius: 11px;
+        text-align: left;
+    }
+
+    .font-preview {
+        color: #e34b4f;
+        font-size: 24px;
+        font-weight: 900;
+        line-height: 1;
+        text-align: center;
+    }
+
+    .font-name {
+        overflow: hidden;
+        font-size: 10px;
+        font-weight: 700;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
 
     .field {

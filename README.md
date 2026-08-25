@@ -16,7 +16,7 @@ I created this app because I couldn't find a Pomodoro solution I really liked - 
 
 ### ⚙️ Customization
 - Choose from multiple color themes
-- Choose a cactus or heart-shaped menu bar progress symbol
+- Choose a cactus or heart-shaped menu bar progress symbol and completion-alert font
 - Adjust work and break durations
 - Keyboard shortcuts (press 'o' for options)
 
