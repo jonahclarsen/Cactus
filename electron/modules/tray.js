@@ -144,9 +144,10 @@ class TrayManager {
             if (showZeroAlert) {
                 const alertX = cx + symbolSize / 2 + alertGap + alertWidth / 2;
                 const markerWidth = 6 * scale;
-                const stemHeight = 11 * scale;
+                const stemHeight = 10 * scale;
                 const markerGap = 2 * scale;
-                const markerHeight = stemHeight + markerGap + markerWidth;
+                const dotHeight = 4 * scale;
+                const markerHeight = stemHeight + markerGap + dotHeight;
                 const markerTop = cy - markerHeight / 2;
                 ctx.fillStyle = '#e34b4f';
                 ctx.fillRect(alertX - markerWidth / 2, markerTop, markerWidth, stemHeight);
@@ -154,7 +155,7 @@ class TrayManager {
                     alertX - markerWidth / 2,
                     markerTop + stemHeight + markerGap,
                     markerWidth,
-                    markerWidth
+                    dotHeight
                 );
             }
 
