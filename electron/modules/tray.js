@@ -6,6 +6,7 @@ const { drawTraySymbolPath } = require('./tray-symbols');
 const ALERT_FONTS = require('../alert-fonts.json');
 
 const ALERT_FONT_FAMILIES = new Map(ALERT_FONTS.map((font) => [font.id, font.family]));
+const ALERT_FONT_SIZE = 24;
 
 const THEME_PRIMARY_COLORS = {
     violet: '#8a63b8',
@@ -149,7 +150,7 @@ class TrayManager {
                 const alertFont = ALERT_FONT_FAMILIES.get(this.settings.completionAlertFont)
                     || ALERT_FONT_FAMILIES.get('lucida-grande');
                 const alertWeight = this.settings.completionAlertWeight || 900;
-                ctx.font = `${alertWeight} ${20 * scale}px ${alertFont}`;
+                ctx.font = `${alertWeight} ${ALERT_FONT_SIZE * scale}px ${alertFont}`;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 ctx.fillStyle = '#e34b4f';
