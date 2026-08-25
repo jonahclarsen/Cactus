@@ -87,7 +87,18 @@
     {
         "id": "pangram-rounded",
         "name": "Pangram Sans Rounded",
-        "family": "\"PP Pangram Sans Rounded\", sans-serif"
+        "family": "\"PP Pangram Sans Rounded\", sans-serif",
+        "canvasFaces": {
+            "100": "PPPangramSansRounded-Thin.otf",
+            "200": "PPPangramSansRounded-Thin.otf",
+            "300": "PPPangramSansRounded-Light.otf",
+            "400": "PPPangramSansRounded-CompactRegular.otf",
+            "500": "PPPangramSansRounded-Medium.otf",
+            "600": "PPPangramSansRounded-Semibold.otf",
+            "700": "PPPangramSansRounded-Bold.otf",
+            "800": "PPPangramSansRounded-Bold.otf",
+            "900": "PPPangramSansRounded-Bold.otf"
+        }
     },
     {
         "id": "sequel-sans",

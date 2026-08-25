@@ -1,12 +1,40 @@
-const { Tray, nativeImage } = require('electron');
+const { app, Tray, nativeImage } = require('electron');
 const path = require('path');
 const fs = require('fs');
-const { createCanvas } = require('@napi-rs/canvas');
+const { createCanvas, GlobalFonts } = require('@napi-rs/canvas');
 const { drawTraySymbolPath } = require('./tray-symbols');
 const ALERT_FONTS = require('../alert-fonts.json');
 
-const ALERT_FONT_FAMILIES = new Map(ALERT_FONTS.map((font) => [font.id, font.family]));
+const ALERT_FONT_CONFIGS = new Map(ALERT_FONTS.map((font) => [font.id, font]));
 const ALERT_FONT_SIZE = 24;
+const REGISTERED_ALERT_FACES = new Map();
+
+function resolveAlertFont(fontId, weight) {
+    const font = ALERT_FONT_CONFIGS.get(fontId) || ALERT_FONT_CONFIGS.get('lucida-grande');
+    const faceFilename = font.canvasFaces?.[String(weight)];
+    if (!faceFilename) return { family: font.family, weight };
+
+    const cacheKey = `${font.id}:${weight}`;
+    if (REGISTERED_ALERT_FACES.has(cacheKey)) {
+        return REGISTERED_ALERT_FACES.get(cacheKey);
+    }
+
+    const alias = `Cactus ${font.id} ${weight}`;
+    const fontDirectories = [
+        path.join(app.getPath('home'), 'Library', 'Fonts'),
+        '/Library/Fonts',
+        '/System/Library/Fonts',
+    ];
+    const facePath = fontDirectories
+        .map((directory) => path.join(directory, faceFilename))
+        .find((candidate) => fs.existsSync(candidate));
+    const resolved = facePath && GlobalFonts.registerFromPath(facePath, alias)
+        ? { family: `"${alias}"`, weight: 400 }
+        : { family: font.family, weight };
+
+    REGISTERED_ALERT_FACES.set(cacheKey, resolved);
+    return resolved;
+}
 
 const THEME_PRIMARY_COLORS = {
     violet: '#8a63b8',
@@ -147,10 +175,9 @@ class TrayManager {
 
             if (showZeroAlert) {
                 const alertX = cx + symbolSize / 2 + alertGap + alertWidth / 2;
-                const alertFont = ALERT_FONT_FAMILIES.get(this.settings.completionAlertFont)
-                    || ALERT_FONT_FAMILIES.get('lucida-grande');
                 const alertWeight = this.settings.completionAlertWeight || 900;
-                ctx.font = `${alertWeight} ${ALERT_FONT_SIZE * scale}px ${alertFont}`;
+                const alertFont = resolveAlertFont(this.settings.completionAlertFont, alertWeight);
+                ctx.font = `${alertFont.weight} ${ALERT_FONT_SIZE * scale}px ${alertFont.family}`;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 ctx.fillStyle = '#e34b4f';
