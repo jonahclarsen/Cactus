@@ -146,7 +146,7 @@ class TrayManager {
                 ctx.save();
                 ctx.translate(alertX, cy);
                 ctx.scale(1.6, 1);
-                ctx.font = `900 ${21 * scale}px "Helvetica Neue", Arial, sans-serif`;
+                ctx.font = `900 ${21 * scale}px Arial, sans-serif`;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 ctx.fillStyle = '#e34b4f';
