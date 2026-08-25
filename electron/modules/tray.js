@@ -10,7 +10,7 @@ const THEME_PRIMARY_COLORS = {
     ocean: '#278b9f',
     sunset: '#c77832',
     berry: '#b45672',
-    pink: '#e16491',
+    pink: '#e76f89',
     mint: '#42a878',
     midnight: '#596fbb',
     graphite: '#777774',
@@ -62,8 +62,8 @@ class TrayManager {
         const minutesLeft = this.timerManager.secondsToMinutesFloor(this.timerManager.timeRemainingSeconds());
         this.renderTrayImage(minutesLeft, () => { });
 
-        // Only show the minutes as system text; timer progress is in the symbol.
-        const trayTitle = minutesLeft === 0 ? '❗' : String(minutesLeft);
+        // Zero uses the red canvas alert rendered beside the symbol below.
+        const trayTitle = minutesLeft === 0 ? '' : String(minutesLeft);
         try { this.tray.setTitle(trayTitle); } catch { }
 
         this.tray.setToolTip(`Timer: ${minutesLeft} minutes remaining`);
@@ -75,9 +75,15 @@ class TrayManager {
             const scale = 2;
             const pointH = 26;
 
-            const symbolSize = 18 * scale;
+            const symbol = this.settings.traySymbol === 'heart' ? 'heart' : 'cactus';
+            const symbolSize = (symbol === 'heart' ? 19 : 18) * scale;
+            const showZeroAlert = minutesLeft === 0;
+            const alertGap = 2 * scale;
+            const alertWidth = 5 * scale;
+            const contentWidth = symbolSize + (showZeroAlert ? alertGap + alertWidth : 0);
+            const horizontalPadding = 2 * scale;
             const minWidth = 32 * scale;
-            const w = Math.max(minWidth, Math.ceil(symbolSize + 8));
+            const w = Math.max(minWidth, Math.ceil(contentWidth + horizontalPadding * 2));
             const pointW = Math.ceil(w / scale);
             const h = pointH * scale;
 
@@ -91,7 +97,6 @@ class TrayManager {
 
             // Determine colors - use theme from settings
             const symbolColor = THEME_PRIMARY_COLORS[this.settings.theme] || THEME_PRIMARY_COLORS.violet;
-            const symbol = this.settings.traySymbol === 'heart' ? 'heart' : 'cactus';
 
             // Calculate timer progress (frac is how much has elapsed, 0 to 1)
             const total = this.state.timer.initialSeconds || (this.state.timer.isBreak ?
@@ -100,7 +105,9 @@ class TrayManager {
             const rem = Math.max(0, this.timerManager.timeRemainingSeconds());
             const frac = total > 0 ? Math.max(0, Math.min(1, 1 - rem / total)) : 0;
 
-            const cx = w / 2;
+            const cx = showZeroAlert
+                ? (w - contentWidth) / 2 + symbolSize / 2
+                : w / 2;
             const cy = h / 2;
 
             // Keep the complete silhouette visible while progress fills it in.
@@ -130,6 +137,15 @@ class TrayManager {
                 // Restore context
                 ctx.restore();
                 ctx.globalAlpha = 1;
+            }
+
+            if (showZeroAlert) {
+                const alertX = cx + symbolSize / 2 + alertGap + alertWidth / 2;
+                ctx.font = `600 ${15 * scale}px "Helvetica Neue", Arial, sans-serif`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillStyle = '#e34b4f';
+                ctx.fillText('!', alertX, cy);
             }
 
             // Convert to image buffer and create nativeImage
