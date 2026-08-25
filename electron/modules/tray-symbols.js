@@ -49,28 +49,30 @@ function drawHeartPath(ctx, x, y, width, height) {
     const rightX = x + width / 2;
     const topY = y - height / 2;
     const bottomY = y + height / 2;
-    const cleftY = topY + height * 0.32;
+    const midY = y;
+    const heartTopY = topY + height * 0.15;
+    const cleftY = topY + height * 0.2;
 
     ctx.beginPath();
     ctx.moveTo(x, bottomY);
     ctx.bezierCurveTo(
-        x - width * 0.08, bottomY - height * 0.08,
-        leftX, y + height * 0.12,
-        leftX, topY + height * 0.28
+        leftX + width * 0.25, bottomY - height * 0.1,
+        leftX, midY,
+        leftX + width * 0.1, heartTopY
     );
     ctx.bezierCurveTo(
-        leftX, topY + height * 0.02,
-        x - width * 0.2, topY,
+        leftX + width * 0.15, topY + height * 0.05,
+        x - width * 0.05, topY + height * 0.1,
         x, cleftY
     );
     ctx.bezierCurveTo(
-        x + width * 0.2, topY,
-        rightX, topY + height * 0.02,
-        rightX, topY + height * 0.28
+        x + width * 0.05, topY + height * 0.1,
+        rightX - width * 0.15, topY + height * 0.05,
+        rightX - width * 0.1, heartTopY
     );
     ctx.bezierCurveTo(
-        rightX, y + height * 0.12,
-        x + width * 0.08, bottomY - height * 0.08,
+        rightX, midY,
+        rightX - width * 0.25, bottomY - height * 0.1,
         x, bottomY
     );
     ctx.closePath();
