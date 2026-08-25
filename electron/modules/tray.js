@@ -81,7 +81,7 @@ class TrayManager {
             const symbolSize = (symbol === 'heart' ? 19 : 18) * scale;
             const symbolHeight = symbol === 'heart' ? symbolSize * 0.97 : symbolSize;
             const alertGap = 4 * scale;
-            const alertWidth = 8 * scale;
+            const alertWidth = 12 * scale;
             const contentWidth = symbolSize + (showZeroAlert ? alertGap + alertWidth : 0);
             const horizontalPadding = 2 * scale;
             const minWidth = 32 * scale;
@@ -145,8 +145,8 @@ class TrayManager {
                 const alertX = cx + symbolSize / 2 + alertGap + alertWidth / 2;
                 ctx.save();
                 ctx.translate(alertX, cy);
-                ctx.scale(1.25, 1);
-                ctx.font = `700 ${18 * scale}px "Helvetica Neue", Arial, sans-serif`;
+                ctx.scale(1.6, 1);
+                ctx.font = `900 ${21 * scale}px "Helvetica Neue", Arial, sans-serif`;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 ctx.fillStyle = '#e34b4f';
