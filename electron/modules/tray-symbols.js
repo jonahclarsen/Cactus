@@ -45,36 +45,57 @@ function drawCactusPath(ctx, x, y, width, height) {
 }
 
 function drawHeartPath(ctx, x, y, width, height) {
-    const leftX = x - width / 2;
-    const rightX = x + width / 2;
-    const topY = y - height / 2;
-    const bottomY = y + height / 2;
-    const midY = y;
-    const heartTopY = topY + height * 0.15;
-    const cleftY = topY + height * 0.3;
+    const px = (coordinate) => x - width / 2 + width * coordinate / 90;
+    const py = (coordinate) => y - height / 2 + height * coordinate / 90;
 
+    // Outer contour from the supplied SVG. Omitting its inner subpath keeps
+    // the heart solid instead of cutting an outline-shaped hole through it.
     ctx.beginPath();
-    ctx.moveTo(x, bottomY);
+    ctx.moveTo(px(45), py(84.334));
+    ctx.lineTo(px(6.802), py(46.136));
     ctx.bezierCurveTo(
-        leftX + width * 0.1, bottomY - height * 0.08,
-        leftX, midY + height * 0.08,
-        leftX + width * 0.06, heartTopY
+        px(2.416), py(41.75),
+        px(0), py(35.918),
+        px(0), py(29.716)
     );
     ctx.bezierCurveTo(
-        leftX + width * 0.08, topY + height * 0.05,
-        x - width * 0.05, topY + height * 0.1,
-        x, cleftY
+        px(0), py(23.513),
+        px(2.416), py(17.682),
+        px(6.802), py(13.296)
     );
     ctx.bezierCurveTo(
-        x + width * 0.05, topY + height * 0.1,
-        rightX - width * 0.08, topY + height * 0.05,
-        rightX - width * 0.06, heartTopY
+        px(11.188), py(8.91),
+        px(17.019), py(6.494),
+        px(23.222), py(6.494)
     );
     ctx.bezierCurveTo(
-        rightX, midY + height * 0.08,
-        rightX - width * 0.1, bottomY - height * 0.08,
-        x, bottomY
+        px(29.425), py(6.494),
+        px(35.256), py(8.91),
+        px(39.642), py(13.296)
     );
+    ctx.lineTo(px(45), py(18.654));
+    ctx.lineTo(px(50.358), py(13.296));
+    ctx.bezierCurveTo(
+        px(54.744), py(8.91),
+        px(60.576), py(6.494),
+        px(66.778), py(6.494)
+    );
+    ctx.bezierCurveTo(
+        px(72.981), py(6.494),
+        px(78.812), py(8.91),
+        px(83.198), py(13.296)
+    );
+    ctx.bezierCurveTo(
+        px(87.585), py(17.682),
+        px(90), py(23.513),
+        px(90), py(29.716)
+    );
+    ctx.bezierCurveTo(
+        px(90), py(35.919),
+        px(87.585), py(41.75),
+        px(83.198), py(46.136)
+    );
+    ctx.lineTo(px(45), py(84.334));
     ctx.closePath();
 }
 
