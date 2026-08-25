@@ -59,17 +59,19 @@ class TrayManager {
     updateTrayTitleAndIcon() {
         if (!this.tray) return;
 
-        const minutesLeft = this.timerManager.secondsToMinutesFloor(this.timerManager.timeRemainingSeconds());
-        this.renderTrayImage(minutesLeft, () => { });
+        const remainingSeconds = this.timerManager.timeRemainingSeconds();
+        const minutesLeft = this.timerManager.secondsToMinutesFloor(remainingSeconds);
+        const showZeroAlert = remainingSeconds <= 0 && Boolean(this.state.lastEnded);
+        this.renderTrayImage(minutesLeft, showZeroAlert, () => { });
 
         // Zero uses the red canvas alert rendered beside the symbol below.
-        const trayTitle = minutesLeft === 0 ? '' : String(minutesLeft);
+        const trayTitle = showZeroAlert ? '' : String(minutesLeft);
         try { this.tray.setTitle(trayTitle); } catch { }
 
         this.tray.setToolTip(`Timer: ${minutesLeft} minutes remaining`);
     }
 
-    renderTrayImage(minutesLeft, cb) {
+    renderTrayImage(minutesLeft, showZeroAlert, cb) {
         try {
             // Render at 2x for HiDPI displays
             const scale = 2;
@@ -77,8 +79,7 @@ class TrayManager {
 
             const symbol = this.settings.traySymbol === 'heart' ? 'heart' : 'cactus';
             const symbolSize = (symbol === 'heart' ? 19 : 18) * scale;
-            const showZeroAlert = minutesLeft === 0;
-            const alertGap = 2 * scale;
+            const alertGap = 4 * scale;
             const alertWidth = 5 * scale;
             const contentWidth = symbolSize + (showZeroAlert ? alertGap + alertWidth : 0);
             const horizontalPadding = 2 * scale;
