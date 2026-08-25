@@ -148,7 +148,8 @@ class TrayManager {
                 const alertX = cx + symbolSize / 2 + alertGap + alertWidth / 2;
                 const alertFont = ALERT_FONT_FAMILIES.get(this.settings.completionAlertFont)
                     || ALERT_FONT_FAMILIES.get('lucida-grande');
-                ctx.font = `900 ${20 * scale}px ${alertFont}`;
+                const alertWeight = this.settings.completionAlertWeight || 900;
+                ctx.font = `${alertWeight} ${20 * scale}px ${alertFont}`;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 ctx.fillStyle = '#e34b4f';

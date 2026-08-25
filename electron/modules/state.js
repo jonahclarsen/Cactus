@@ -9,6 +9,7 @@ const DEFAULT_SETTINGS = {
     theme: 'violet',
     traySymbol: 'cactus',
     completionAlertFont: 'lucida-grande',
+    completionAlertWeight: 900,
     acceptableHourRange: 6,
     durations: { workMinutes: 30, breakMinutes: 3 },
     soundVolume: 100, // Volume for timer end sound (0-100)
@@ -42,6 +43,12 @@ function normalizeThemeKey(themeKey) {
 
 function normalizeAlertFont(fontKey) {
     return ALERT_FONT_KEYS.has(fontKey) ? fontKey : DEFAULT_SETTINGS.completionAlertFont;
+}
+
+function normalizeAlertWeight(weight) {
+    const numericWeight = Number(weight);
+    if (!Number.isFinite(numericWeight)) return DEFAULT_SETTINGS.completionAlertWeight;
+    return Math.min(900, Math.max(100, Math.round(numericWeight / 100) * 100));
 }
 
 const DEFAULT_STATE = {
@@ -119,6 +126,7 @@ class StateManager {
                     ...json.settings,
                     theme: normalizeThemeKey(json.settings?.theme),
                     completionAlertFont: normalizeAlertFont(json.settings?.completionAlertFont),
+                    completionAlertWeight: normalizeAlertWeight(json.settings?.completionAlertWeight),
                     durations: { ...DEFAULT_SETTINGS.durations, ...(json.settings?.durations || {}) }
                 };
                 this.state = {
@@ -167,6 +175,9 @@ class StateManager {
             theme: normalizeThemeKey(nextSettings.theme ?? this.settings.theme),
             completionAlertFont: normalizeAlertFont(
                 nextSettings.completionAlertFont ?? this.settings.completionAlertFont
+            ),
+            completionAlertWeight: normalizeAlertWeight(
+                nextSettings.completionAlertWeight ?? this.settings.completionAlertWeight
             ),
         };
 

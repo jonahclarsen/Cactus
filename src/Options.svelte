@@ -8,6 +8,17 @@
     export let api;
 
     const dispatch = createEventDispatcher();
+    const ALERT_WEIGHT_LABELS = {
+        100: "Hairline",
+        200: "Extra Light",
+        300: "Light",
+        400: "Regular",
+        500: "Medium",
+        600: "Semibold",
+        700: "Bold",
+        800: "Extra Bold",
+        900: "Black",
+    };
 
     function persistOptions() {
         const snapshot = JSON.parse(JSON.stringify(editingSettings));
@@ -28,6 +39,14 @@
 
     function chooseCompletionAlertFont(completionAlertFont) {
         editingSettings = { ...editingSettings, completionAlertFont };
+        persistOptions();
+    }
+
+    function updateCompletionAlertWeight(event) {
+        editingSettings = {
+            ...editingSettings,
+            completionAlertWeight: Number(event.currentTarget.value),
+        };
         persistOptions();
     }
 
@@ -70,6 +89,13 @@
     )
         ? editingSettings.completionAlertFont
         : "lucida-grande";
+    $: activeAlertWeight = Math.min(
+        900,
+        Math.max(
+            100,
+            Math.round((Number(editingSettings.completionAlertWeight) || 900) / 100) * 100,
+        ),
+    );
 </script>
 
 <div class="options root">
@@ -139,13 +165,31 @@
                     >
                         <span
                             class="font-preview"
-                            style={`font-family: ${font.family}`}
+                            style={`font-family: ${font.family}; font-weight: ${activeAlertWeight}`}
                             aria-hidden="true"
                         >!</span>
                         <span class="font-name">{font.name}</span>
                         <span class="selected-mark" aria-hidden="true">✓</span>
                     </button>
                 {/each}
+            </div>
+            <div class="font-weight-control">
+                <label for="completion-alert-weight">
+                    Weight: {ALERT_WEIGHT_LABELS[activeAlertWeight]} ({activeAlertWeight})
+                </label>
+                <input
+                    id="completion-alert-weight"
+                    type="range"
+                    min="100"
+                    max="900"
+                    step="100"
+                    value={activeAlertWeight}
+                    on:input={updateCompletionAlertWeight}
+                />
+                <div class="range-extremes" aria-hidden="true">
+                    <span>100 · Hairline</span>
+                    <span>900 · Black</span>
+                </div>
             </div>
         </div>
 
@@ -403,6 +447,18 @@
         font-weight: 700;
         text-overflow: ellipsis;
         white-space: nowrap;
+    }
+
+    .font-weight-control {
+        margin-top: 10px;
+    }
+
+    .range-extremes {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 3px;
+        color: var(--muted);
+        font-size: 9px;
     }
 
     .field {
