@@ -48,7 +48,7 @@ function normalizeAlertFont(fontKey) {
 function normalizeAlertWeight(weight) {
     const numericWeight = Number(weight);
     if (!Number.isFinite(numericWeight)) return DEFAULT_SETTINGS.completionAlertWeight;
-    return Math.min(900, Math.max(100, Math.round(numericWeight / 100) * 100));
+    return Math.min(1500, Math.max(100, Math.round(numericWeight / 100) * 100));
 }
 
 const DEFAULT_STATE = {

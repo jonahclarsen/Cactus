@@ -113,7 +113,7 @@ class TrayManager {
             const symbolSize = (symbol === 'heart' ? 19 : 18) * scale;
             const symbolHeight = symbol === 'heart' ? symbolSize * 0.97 : symbolSize;
             const alertGap = 4 * scale;
-            const alertWidth = 12 * scale;
+            const alertWidth = 14 * scale;
             const contentWidth = symbolSize + (showZeroAlert ? alertGap + alertWidth : 0);
             const horizontalPadding = 2 * scale;
             const minWidth = 32 * scale;
@@ -176,11 +176,19 @@ class TrayManager {
             if (showZeroAlert) {
                 const alertX = cx + symbolSize / 2 + alertGap + alertWidth / 2;
                 const alertWeight = this.settings.completionAlertWeight || 900;
-                const alertFont = resolveAlertFont(this.settings.completionAlertFont, alertWeight);
+                const canvasWeight = Math.min(alertWeight, 900);
+                const alertFont = resolveAlertFont(this.settings.completionAlertFont, canvasWeight);
                 ctx.font = `${alertFont.weight} ${ALERT_FONT_SIZE * scale}px ${alertFont.family}`;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 ctx.fillStyle = '#e34b4f';
+                const extraStrokeWidth = Math.max(0, (alertWeight - 900) / 100 * 0.5 * scale);
+                if (extraStrokeWidth > 0) {
+                    ctx.lineJoin = 'round';
+                    ctx.lineWidth = extraStrokeWidth;
+                    ctx.strokeStyle = '#e34b4f';
+                    ctx.strokeText('!', alertX, cy);
+                }
                 ctx.fillText('!', alertX, cy);
             }
 

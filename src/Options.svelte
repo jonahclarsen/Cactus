@@ -18,6 +18,12 @@
         700: "Bold",
         800: "Extra Bold",
         900: "Black",
+        1000: "Extra Black",
+        1100: "Heavy",
+        1200: "Extra Heavy",
+        1300: "Ultra",
+        1400: "Ultra Heavy",
+        1500: "Maximum",
     };
 
     function persistOptions() {
@@ -90,12 +96,14 @@
         ? editingSettings.completionAlertFont
         : "lucida-grande";
     $: activeAlertWeight = Math.min(
-        900,
+        1500,
         Math.max(
             100,
             Math.round((Number(editingSettings.completionAlertWeight) || 900) / 100) * 100,
         ),
     );
+    $: previewAlertWeight = Math.min(activeAlertWeight, 900);
+    $: previewAlertStrokeWidth = Math.max(0, (activeAlertWeight - 900) / 100 * 0.5);
 </script>
 
 <div class="options root">
@@ -165,7 +173,7 @@
                     >
                         <span
                             class="font-preview"
-                            style={`font-family: ${font.family}; font-weight: ${activeAlertWeight}`}
+                            style={`font-family: ${font.family}; font-weight: ${previewAlertWeight}; -webkit-text-stroke: ${previewAlertStrokeWidth}px #e34b4f`}
                             aria-hidden="true"
                         >!</span>
                         <span class="font-name">{font.name}</span>
@@ -181,14 +189,14 @@
                     id="completion-alert-weight"
                     type="range"
                     min="100"
-                    max="900"
+                    max="1500"
                     step="100"
                     value={activeAlertWeight}
                     on:input={updateCompletionAlertWeight}
                 />
                 <div class="range-extremes" aria-hidden="true">
                     <span>100 · Hairline</span>
-                    <span>900 · Black</span>
+                    <span>1500 · Maximum</span>
                 </div>
             </div>
         </div>
