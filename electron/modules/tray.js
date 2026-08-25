@@ -143,15 +143,19 @@ class TrayManager {
 
             if (showZeroAlert) {
                 const alertX = cx + symbolSize / 2 + alertGap + alertWidth / 2;
-                ctx.save();
-                ctx.translate(alertX, cy);
-                ctx.scale(1.6, 1);
-                ctx.font = `900 ${21 * scale}px Arial, sans-serif`;
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
+                const markerWidth = 6 * scale;
+                const stemHeight = 11 * scale;
+                const markerGap = 2 * scale;
+                const markerHeight = stemHeight + markerGap + markerWidth;
+                const markerTop = cy - markerHeight / 2;
                 ctx.fillStyle = '#e34b4f';
-                ctx.fillText('!', 0, 0);
-                ctx.restore();
+                ctx.fillRect(alertX - markerWidth / 2, markerTop, markerWidth, stemHeight);
+                ctx.fillRect(
+                    alertX - markerWidth / 2,
+                    markerTop + stemHeight + markerGap,
+                    markerWidth,
+                    markerWidth
+                );
             }
 
             // Convert to image buffer and create nativeImage
