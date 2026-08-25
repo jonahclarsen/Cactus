@@ -79,8 +79,9 @@ class TrayManager {
 
             const symbol = this.settings.traySymbol === 'heart' ? 'heart' : 'cactus';
             const symbolSize = (symbol === 'heart' ? 19 : 18) * scale;
+            const symbolHeight = symbol === 'heart' ? symbolSize * 0.97 : symbolSize;
             const alertGap = 4 * scale;
-            const alertWidth = 5 * scale;
+            const alertWidth = 8 * scale;
             const contentWidth = symbolSize + (showZeroAlert ? alertGap + alertWidth : 0);
             const horizontalPadding = 2 * scale;
             const minWidth = 32 * scale;
@@ -112,7 +113,7 @@ class TrayManager {
             const cy = h / 2;
 
             // Keep the complete silhouette visible while progress fills it in.
-            drawTraySymbolPath(ctx, symbol, cx, cy, symbolSize, symbolSize);
+            drawTraySymbolPath(ctx, symbol, cx, cy, symbolSize, symbolHeight);
             ctx.fillStyle = symbolColor;
             ctx.globalAlpha = 0.22;
             ctx.fill();
@@ -123,12 +124,12 @@ class TrayManager {
                 // Save context to apply clipping
                 ctx.save();
 
-                drawTraySymbolPath(ctx, symbol, cx, cy, symbolSize, symbolSize);
+                drawTraySymbolPath(ctx, symbol, cx, cy, symbolSize, symbolHeight);
                 ctx.clip();
 
                 // Calculate fill height (from bottom)
-                const fillHeight = symbolSize * frac;
-                const fillY = cy + symbolSize / 2 - fillHeight;
+                const fillHeight = symbolHeight * frac;
+                const fillY = cy + symbolHeight / 2 - fillHeight;
 
                 // Fill from bottom to the calculated height
                 ctx.fillStyle = symbolColor;
@@ -142,11 +143,15 @@ class TrayManager {
 
             if (showZeroAlert) {
                 const alertX = cx + symbolSize / 2 + alertGap + alertWidth / 2;
-                ctx.font = `600 ${15 * scale}px "Helvetica Neue", Arial, sans-serif`;
+                ctx.save();
+                ctx.translate(alertX, cy);
+                ctx.scale(1.25, 1);
+                ctx.font = `700 ${18 * scale}px "Helvetica Neue", Arial, sans-serif`;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 ctx.fillStyle = '#e34b4f';
-                ctx.fillText('!', alertX, cy);
+                ctx.fillText('!', 0, 0);
+                ctx.restore();
             }
 
             // Convert to image buffer and create nativeImage
