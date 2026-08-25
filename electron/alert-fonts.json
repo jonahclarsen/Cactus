@@ -48,5 +48,55 @@
         "id": "geneva",
         "name": "Geneva",
         "family": "Geneva, sans-serif"
+    },
+    {
+        "id": "pt-sans",
+        "name": "PT Sans",
+        "family": "\"PT Sans\", sans-serif"
+    },
+    {
+        "id": "tahoma",
+        "name": "Tahoma",
+        "family": "Tahoma, sans-serif"
+    },
+    {
+        "id": "din-condensed",
+        "name": "DIN Condensed",
+        "family": "\"DIN Condensed\", sans-serif"
+    },
+    {
+        "id": "din-alternate",
+        "name": "DIN Alternate",
+        "family": "\"DIN Alternate\", sans-serif"
+    },
+    {
+        "id": "microsoft-sans-serif",
+        "name": "Microsoft Sans Serif",
+        "family": "\"Microsoft Sans Serif\", sans-serif"
+    },
+    {
+        "id": "apple-gothic",
+        "name": "AppleGothic",
+        "family": "AppleGothic, sans-serif"
+    },
+    {
+        "id": "hiragino-sans",
+        "name": "Hiragino Sans",
+        "family": "\"Hiragino Sans\", sans-serif"
+    },
+    {
+        "id": "pangram-rounded",
+        "name": "Pangram Sans Rounded",
+        "family": "\"PP Pangram Sans Rounded\", sans-serif"
+    },
+    {
+        "id": "sequel-sans",
+        "name": "Sequel Sans",
+        "family": "\"Sequel Sans\", sans-serif"
+    },
+    {
+        "id": "frutiger-condensed",
+        "name": "Frutiger Condensed",
+        "family": "\"Frutiger 57 Condensed\", sans-serif"
     }
 ]
