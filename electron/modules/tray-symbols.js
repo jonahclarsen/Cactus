@@ -51,7 +51,7 @@ function drawHeartPath(ctx, x, y, width, height) {
     const bottomY = y + height / 2;
     const midY = y;
     const heartTopY = topY + height * 0.15;
-    const cleftY = topY + height * 0.2;
+    const cleftY = topY + height * 0.25;
 
     ctx.beginPath();
     ctx.moveTo(x, bottomY);
