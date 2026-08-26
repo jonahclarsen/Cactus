@@ -175,6 +175,8 @@ class TrayManager {
 
             if (showZeroAlert) {
                 const alertX = cx + symbolSize / 2 + alertGap + alertWidth / 2;
+                const alertY = cy
+                    + (Number(this.settings.completionAlertVerticalOffset) || 0) * scale;
                 const alertWeight = this.settings.completionAlertWeight || 900;
                 const canvasWeight = Math.min(alertWeight, 900);
                 const alertFont = resolveAlertFont(this.settings.completionAlertFont, canvasWeight);
@@ -187,9 +189,9 @@ class TrayManager {
                     ctx.lineJoin = 'round';
                     ctx.lineWidth = extraStrokeWidth;
                     ctx.strokeStyle = '#e34b4f';
-                    ctx.strokeText('!', alertX, cy);
+                    ctx.strokeText('!', alertX, alertY);
                 }
-                ctx.fillText('!', alertX, cy);
+                ctx.fillText('!', alertX, alertY);
             }
 
             // Convert to image buffer and create nativeImage

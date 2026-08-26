@@ -56,6 +56,19 @@
         persistOptions();
     }
 
+    function updateCompletionAlertVerticalOffset(event) {
+        editingSettings = {
+            ...editingSettings,
+            completionAlertVerticalOffset: Number(event.currentTarget.value),
+        };
+        persistOptions();
+    }
+
+    function formatVerticalOffset(offset) {
+        if (offset === 0) return "Centered";
+        return `${Math.abs(offset)} pt ${offset < 0 ? "up" : "down"}`;
+    }
+
     function updateDuration(duration, event) {
         const value = Math.max(1, Number(event.currentTarget.value) || 1);
         editingSettings = {
@@ -104,6 +117,13 @@
     );
     $: previewAlertWeight = Math.min(activeAlertWeight, 900);
     $: previewAlertStrokeWidth = Math.max(0, (activeAlertWeight - 900) / 100 * 0.5);
+    $: activeAlertVerticalOffset = Math.min(
+        6,
+        Math.max(
+            -6,
+            Math.round((Number(editingSettings.completionAlertVerticalOffset) || 0) * 2) / 2,
+        ),
+    );
 </script>
 
 <div class="options root">
@@ -173,7 +193,7 @@
                     >
                         <span
                             class="font-preview"
-                            style={`font-family: ${font.family}; font-weight: ${previewAlertWeight}; -webkit-text-stroke: ${previewAlertStrokeWidth}px #e34b4f`}
+                            style={`font-family: ${font.family}; font-weight: ${previewAlertWeight}; -webkit-text-stroke: ${previewAlertStrokeWidth}px #e34b4f; transform: translateY(${activeAlertVerticalOffset}px)`}
                             aria-hidden="true"
                         >!</span>
                         <span class="font-name">{font.name}</span>
@@ -197,6 +217,24 @@
                 <div class="range-extremes" aria-hidden="true">
                     <span>100 · Hairline</span>
                     <span>1500 · Maximum</span>
+                </div>
+            </div>
+            <div class="font-weight-control">
+                <label for="completion-alert-position">
+                    Vertical position: {formatVerticalOffset(activeAlertVerticalOffset)}
+                </label>
+                <input
+                    id="completion-alert-position"
+                    type="range"
+                    min="-6"
+                    max="6"
+                    step="0.5"
+                    value={activeAlertVerticalOffset}
+                    on:input={updateCompletionAlertVerticalOffset}
+                />
+                <div class="range-extremes" aria-hidden="true">
+                    <span>6 pt up</span>
+                    <span>6 pt down</span>
                 </div>
             </div>
         </div>
