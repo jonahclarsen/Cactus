@@ -1,4 +1,4 @@
-const { app } = require('electron');
+const { app, globalShortcut } = require('electron');
 
 const { StateManager } = require('./modules/state');
 const { TimerManager } = require('./modules/timer');
@@ -42,6 +42,18 @@ app.whenReady().then(() => {
 
     // Set up IPC communication
     setupIpcHandlers(stateManager, timerManager, windowManager, trayManager);
+
+    const shortcut = 'Alt+Shift+D';
+    const registered = globalShortcut.register(shortcut, () => {
+        // Preserve work sessions with time left, including paused sessions.
+        if (!timerManager.state.timer.isBreak && timerManager.timeRemainingSeconds() > 0) {
+            return;
+        }
+        timerManager.startTimer(false);
+    });
+    if (!registered) {
+        console.error(`Failed to register global shortcut: ${shortcut}`);
+    }
 });
 
 app.on('window-all-closed', (e) => {
@@ -52,6 +64,7 @@ app.on('window-all-closed', (e) => {
 });
 
 app.on('before-quit', () => {
+    globalShortcut.unregisterAll();
     stateManager.stopAutoSave();
     timerManager.stop();
     stateManager.saveData();
