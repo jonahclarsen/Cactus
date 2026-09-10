@@ -56,6 +56,11 @@ I created this app because I couldn't find a Pomodoro solution I really liked - 
 
 ### Time Extensions
 
+Global shortcuts work while Cactus is running, even when its window is hidden:
+- **Alt+Shift+D**: Start a Pomodoro unless a work session already has time left
+- **Alt+Shift+S**: Remove 5 minutes from the timer
+- **Alt+Shift+F**: Add 5 minutes to the timer
+
 Use the `+` and `-` buttons with modifiers:
 - **Normal click**: ±1 minute
 - **Cmd/Ctrl + click**: ±5 minutes

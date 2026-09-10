@@ -54,6 +54,18 @@ app.whenReady().then(() => {
     if (!registered) {
         console.error(`Failed to register global shortcut: ${shortcut}`);
     }
+
+    for (const [shortcut, secondsDelta] of [
+        ['Alt+Shift+S', -5 * 60],
+        ['Alt+Shift+F', 5 * 60],
+    ]) {
+        const registered = globalShortcut.register(shortcut, () => {
+            timerManager.extendTimer(secondsDelta);
+        });
+        if (!registered) {
+            console.error(`Failed to register global shortcut: ${shortcut}`);
+        }
+    }
 });
 
 app.on('window-all-closed', (e) => {
