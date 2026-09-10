@@ -43,7 +43,7 @@ app.whenReady().then(() => {
     // Set up IPC communication
     setupIpcHandlers(stateManager, timerManager, windowManager, trayManager);
 
-    const shortcut = 'Alt+Shift+D';
+    const shortcut = 'Alt+Shift+S';
     const registered = globalShortcut.register(shortcut, () => {
         // Preserve work sessions with time left, including paused sessions.
         if (!timerManager.state.timer.isBreak && timerManager.timeRemainingSeconds() > 0) {
@@ -56,8 +56,8 @@ app.whenReady().then(() => {
     }
 
     for (const [shortcut, secondsDelta] of [
-        ['Alt+Shift+S', -5 * 60],
-        ['Alt+Shift+F', 5 * 60],
+        ['Alt+Shift+A', -5 * 60],
+        ['Alt+Shift+D', 5 * 60],
     ]) {
         const registered = globalShortcut.register(shortcut, () => {
             timerManager.extendTimer(secondsDelta);
