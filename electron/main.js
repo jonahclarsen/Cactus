@@ -43,14 +43,17 @@ app.whenReady().then(() => {
     // Set up IPC communication
     setupIpcHandlers(stateManager, timerManager, windowManager, trayManager);
 
-    const shortcut = 'Alt+Shift+S';
-    const registered = globalShortcut.register(shortcut, () => {
+    const startWorkIfNeeded = () => {
         // Preserve work sessions with time left, including paused sessions.
         if (!timerManager.state.timer.isBreak && timerManager.timeRemainingSeconds() > 0) {
             return;
         }
         timerManager.startTimer(false);
-    });
+    };
+    tray.on('right-click', startWorkIfNeeded);
+
+    const shortcut = 'Alt+Shift+S';
+    const registered = globalShortcut.register(shortcut, startWorkIfNeeded);
     if (!registered) {
         console.error(`Failed to register global shortcut: ${shortcut}`);
     }
