@@ -69,6 +69,7 @@ Use the `+` and `-` buttons with modifiers:
 ### Configuration
 
 Press `o` or click "Options" to access settings:
+- Enable Launch at login on macOS (release app only)
 - Select color theme
 - Select a cactus or heart menu bar symbol
 - Set work/break durations

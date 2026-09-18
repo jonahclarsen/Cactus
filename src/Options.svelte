@@ -1,5 +1,5 @@
 <script>
-    import { createEventDispatcher } from "svelte";
+    import { createEventDispatcher, onMount } from "svelte";
     import { THEME_PALETTES, normalizeThemeKey } from "./themes.js";
     import ALERT_FONTS from "../electron/alert-fonts.json";
     import "./button.css";
@@ -8,6 +8,38 @@
     export let api;
 
     const dispatch = createEventDispatcher();
+    let loginSettings = null;
+    let loginBusy = false;
+    let loginError = "";
+
+    async function refreshLoginSettings() {
+        if (loginBusy) return;
+        try {
+            loginSettings = await api.getLoginSettings();
+        } catch (error) {
+            loginError = "Could not read the launch-at-login setting.";
+        }
+    }
+
+    onMount(() => {
+        refreshLoginSettings();
+    });
+
+    async function changeLoginSetting(event) {
+        const enabled = event.currentTarget.checked;
+        loginBusy = true;
+        loginError = "";
+        try {
+            const openAtLogin = await api.setLoginSettings(enabled);
+            loginSettings = { ...loginSettings, openAtLogin };
+        } catch (error) {
+            loginError = "Could not change launch at login. Check macOS System Settings > General > Login Items & Extensions.";
+        } finally {
+            loginBusy = false;
+            await refreshLoginSettings();
+        }
+    }
+
     const ALERT_WEIGHT_LABELS = {
         100: "Hairline",
         200: "Extra Light",
@@ -126,9 +158,34 @@
     );
 </script>
 
+<svelte:window on:focus={refreshLoginSettings} />
+
 <div class="options root">
     <div class="sheet">
         <div class="title"><h2>Options</h2></div>
+
+        {#if loginSettings?.supported}
+            <div class="section">
+                <h3>Startup</h3>
+                <label class="login-toggle">
+                    <input
+                        type="checkbox"
+                        checked={loginSettings.openAtLogin}
+                        disabled={!loginSettings.available || loginBusy}
+                        on:change={changeLoginSetting}
+                    />
+                    Launch at login
+                </label>
+                <p class="startup-note">
+                    {loginSettings.available
+                        ? "Open quietly in the menu bar when you log in."
+                        : "Available in the macOS release app."}
+                </p>
+            </div>
+        {/if}
+        {#if loginError}
+            <p class="startup-note" role="alert">{loginError}</p>
+        {/if}
 
         <div class="section">
             <h3>Theme</h3>
@@ -295,6 +352,27 @@
 </div>
 
 <style>
+    .login-toggle {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--ink);
+        cursor: pointer;
+    }
+
+    .login-toggle input {
+        width: 16px;
+        height: 16px;
+        margin: 0;
+        accent-color: var(--accent);
+    }
+
+    .startup-note {
+        margin: 6px 0 0;
+        color: var(--muted);
+        font-size: 11px;
+    }
+
     .options {
         position: absolute;
         inset: 0;

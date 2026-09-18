@@ -1,4 +1,4 @@
-const { ipcMain, shell } = require('electron');
+const { app, ipcMain, shell } = require('electron');
 
 function setupIpcHandlers(stateManager, timerManager, windowManager, trayManager) {
 
@@ -33,6 +33,30 @@ function setupIpcHandlers(stateManager, timerManager, windowManager, trayManager
 
     // Register IPC handlers
     ipcMain.handle('cactus:get-state', () => getPublicState());
+
+    // Read from macOS so changes made in System Settings stay authoritative.
+    ipcMain.handle('cactus:get-login-settings', () => ({
+        supported: process.platform === 'darwin',
+        available: process.platform === 'darwin' && app.isPackaged,
+        openAtLogin: process.platform === 'darwin' && app.isPackaged
+            ? app.getLoginItemSettings().openAtLogin
+            : false,
+    }));
+
+    ipcMain.handle('cactus:set-login-settings', (_event, openAtLogin) => {
+        if (process.platform !== 'darwin' || !app.isPackaged) {
+            throw new Error('Launch at login is only available in the macOS release app.');
+        }
+        if (typeof openAtLogin !== 'boolean') {
+            throw new TypeError('Launch at login must be a boolean.');
+        }
+        app.setLoginItemSettings({ openAtLogin });
+        const actual = app.getLoginItemSettings().openAtLogin;
+        if (actual !== openAtLogin) {
+            throw new Error('macOS did not apply the login setting. Check System Settings > General > Login Items & Extensions.');
+        }
+        return actual;
+    });
 
     ipcMain.handle('cactus:start-work', () => {
         timerManager.startTimer(false);

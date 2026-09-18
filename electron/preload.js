@@ -1,6 +1,8 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('cactus', {
+    getLoginSettings: () => ipcRenderer.invoke('cactus:get-login-settings'),
+    setLoginSettings: (enabled) => ipcRenderer.invoke('cactus:set-login-settings', enabled),
     getState: () => ipcRenderer.invoke('cactus:get-state'),
     startWork: () => ipcRenderer.invoke('cactus:start-work'),
     startBreak: () => ipcRenderer.invoke('cactus:start-break'),
