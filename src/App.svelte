@@ -83,6 +83,13 @@
             e.preventDefault();
             return;
         }
+        if (showOptions && e.key === "Escape") {
+            e.preventDefault();
+            // Commit any duration edit before removing the focused input.
+            document.activeElement?.blur();
+            showOptions = false;
+            return;
+        }
         if (isEditable || showOptions || e.altKey) return;
         if (e.key && e.key.toLowerCase() === "o" && !e.repeat) openOptions();
     }}

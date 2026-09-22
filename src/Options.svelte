@@ -164,6 +164,32 @@
     <div class="sheet">
         <div class="title"><h2>Options</h2></div>
 
+        <div class="section">
+            <h3>Timer Settings</h3>
+            <div class="field-row">
+                <div class="field half">
+                    <label for="work-length">Work length (minutes)</label>
+                    <input
+                        id="work-length"
+                        type="number"
+                        min="1"
+                        value={editingSettings.durations.workMinutes}
+                        on:change={(event) => updateDuration("workMinutes", event)}
+                    />
+                </div>
+                <div class="field half">
+                    <label for="break-length">Break length (minutes)</label>
+                    <input
+                        id="break-length"
+                        type="number"
+                        min="1"
+                        value={editingSettings.durations.breakMinutes}
+                        on:change={(event) => updateDuration("breakMinutes", event)}
+                    />
+                </div>
+            </div>
+        </div>
+
         {#if loginSettings?.supported}
             <div class="section">
                 <h3>Startup</h3>
@@ -292,32 +318,6 @@
                 <div class="range-extremes" aria-hidden="true">
                     <span>6 pt up</span>
                     <span>6 pt down</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="section">
-            <h3>Timer Settings</h3>
-            <div class="field-row">
-                <div class="field half">
-                    <label for="work-length">Work length (minutes)</label>
-                    <input
-                        id="work-length"
-                        type="number"
-                        min="1"
-                        value={editingSettings.durations.workMinutes}
-                        on:change={(event) => updateDuration("workMinutes", event)}
-                    />
-                </div>
-                <div class="field half">
-                    <label for="break-length">Break length (minutes)</label>
-                    <input
-                        id="break-length"
-                        type="number"
-                        min="1"
-                        value={editingSettings.durations.breakMinutes}
-                        on:change={(event) => updateDuration("breakMinutes", event)}
-                    />
                 </div>
             </div>
         </div>
