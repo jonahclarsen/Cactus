@@ -138,7 +138,11 @@ class TimerManager {
         const delta = Math.floor(secondsDelta);
         const wasRunning = this.state.timer.running;
         if (wasRunning) {
-            this.state.timer.endTs += delta * 1000;
+            const now = Date.now();
+            // Clamp both before and after adjustment so zero never carries a
+            // negative balance, including while waiting for the next end tick.
+            const remainingMs = Math.max(0, this.state.timer.endTs - now);
+            this.state.timer.endTs = now + Math.max(0, remainingMs + delta * 1000);
             this.state.timer.remainingSeconds = this.timeRemainingSeconds();
         } else {
             const next = Math.max(0, (this.state.timer.remainingSeconds || 0) + delta);
