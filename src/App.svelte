@@ -104,17 +104,10 @@
             <TimerDisplay {state} {crayon} />
             <TimerControls {state} {api} bind:hasEnded />
             <div class="bottom-controls">
-                <div
+                <button
+                    type="button"
                     class="link"
                     on:click={togglePlayPause}
-                    on:keydown={(e) => {
-                        if (e.key === "Enter" || e.key === " ") {
-                            e.preventDefault();
-                            togglePlayPause();
-                        }
-                    }}
-                    role="button"
-                    tabindex="0"
                 >
                     {#if state.timer?.running}
                         Pause Timer
@@ -123,22 +116,15 @@
                     {:else}
                         Resume Timer
                     {/if}
-                </div>
-                <div
+                </button>
+                <button
+                    type="button"
                     class="link"
                     on:click={openOptions}
-                    on:keydown={(e) => {
-                        if (e.key === "Enter" || e.key === " ") {
-                            e.preventDefault();
-                            openOptions();
-                        }
-                    }}
-                    role="button"
-                    tabindex="0"
                     title="Options (o)"
                 >
                     Options
-                </div>
+                </button>
             </div>
         </div>
     {/if}
@@ -187,17 +173,20 @@
     .bottom-controls {
         display: flex;
         justify-content: center;
-        padding: -20px 0;
+        align-items: center;
     }
 
     .link {
+        min-height: 44px;
+        padding: 10px 12px;
+        border: 0;
+        background: transparent;
         color: var(--accent);
         text-decoration: underline;
         cursor: pointer;
-        font-size: 13px;
+        font: inherit;
+        font-size: 15px;
         user-select: none;
-        margin-left: 5px;
-        margin-right: 5px;
     }
 
     .link:hover {
