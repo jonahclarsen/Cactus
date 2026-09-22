@@ -58,7 +58,7 @@ app.whenReady().then(() => {
         console.error(`Failed to register global shortcut: ${shortcut}`);
     }
 
-    const toggleShortcut = 'Alt+Shift+F';
+    const toggleShortcut = 'Alt+Shift+X';
     if (!globalShortcut.register(toggleShortcut, () => windowManager.toggleWindow())) {
         console.error(`Failed to register global shortcut: ${toggleShortcut}`);
     }
