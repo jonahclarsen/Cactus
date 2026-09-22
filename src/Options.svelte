@@ -162,7 +162,20 @@
 
 <div class="options root">
     <div class="sheet">
-        <div class="title"><h2>Options</h2></div>
+        <div class="title">
+            <h2>Options</h2>
+            <button
+                type="button"
+                class="close-button"
+                aria-label="Close options"
+                title="Close options"
+                on:click={closeOptions}
+            >
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M6 6l12 12M18 6L6 18" />
+                </svg>
+            </button>
+        </div>
 
         <div class="section">
             <h3>Timer Settings</h3>
@@ -401,12 +414,47 @@
     }
 
     .title {
+        position: relative;
         text-align: center;
     }
 
     .title h2 {
         margin: 2px 0 8px;
         color: var(--ink);
+    }
+
+    .close-button {
+        position: absolute;
+        top: -8px;
+        right: -8px;
+        display: grid;
+        width: 44px;
+        height: 44px;
+        padding: 0;
+        place-items: center;
+        border: 0;
+        border-radius: 50%;
+        background: transparent;
+        color: var(--ink);
+        cursor: pointer;
+    }
+
+    .close-button:hover {
+        background: var(--card);
+    }
+
+    .close-button:focus-visible {
+        outline: 3px solid color-mix(in srgb, var(--accent) 28%, transparent);
+        outline-offset: 1px;
+    }
+
+    .close-button svg {
+        width: 20px;
+        height: 20px;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 2.25;
+        stroke-linecap: round;
     }
 
     .section {
