@@ -61,6 +61,7 @@ Global shortcuts work while Cactus is running, even when its window is hidden:
 - **Right-click the menu bar icon**: Same action as Alt+Shift+S
 - **Alt+Shift+A**: Remove 5 minutes from the timer
 - **Alt+Shift+D**: Add 5 minutes to the timer
+- **Alt+Shift+F**: Show or hide the UI (Option+Shift+F on macOS)
 
 Use the `+` and `-` buttons with modifiers:
 - **Normal click**: ±1 minute
