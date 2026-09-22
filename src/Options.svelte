@@ -433,7 +433,7 @@
         padding: 0;
         place-items: center;
         border: 0;
-        border-radius: 50%;
+        border-radius: 10px;
         background: transparent;
         color: var(--ink);
         cursor: pointer;
