@@ -108,3 +108,16 @@ test('paused adjustments clamp at zero and stay paused', () => {
     assert.equal(manager.timeRemainingSeconds(), 300);
     assert.equal(manager.state.timer.running, false);
 });
+
+test('subtracting to zero notifies listeners when the timer ends', () => {
+    const timer = createTimer();
+    let ticks = 0;
+    timer.manager.onTick = () => ticks++;
+    timer.manager.extendTimer(-600);
+    assert.equal(timer.manager.state.timer.remainingSeconds, 0);
+    ticks = 0;
+    timer.tick();
+    assert.equal(timer.ends, 1);
+    assert.ok(timer.manager.state.lastEnded);
+    assert.equal(ticks, 1);
+});

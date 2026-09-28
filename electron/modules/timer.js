@@ -69,7 +69,8 @@ class TimerManager {
                 const rem = this.timeRemainingSeconds();
                 const lastRem = this.state.timer.remainingSeconds;
                 this.state.timer.remainingSeconds = rem;
-                if (rem <= 0) {
+                const ended = rem <= 0;
+                if (ended) {
                     this.state.timer.running = false;
                     this.state.timer.endTs = 0;
                     this.state.lastEnded = {
@@ -86,7 +87,8 @@ class TimerManager {
                     // Flush to disk soon after end
                     setTimeout(() => this.stateManager.saveData(), 250);
                 }
-                if (lastRem !== rem && this.onTick) {
+                // Ending must always notify: subtracting to zero leaves rem unchanged.
+                if ((ended || lastRem !== rem) && this.onTick) {
                     this.onTick();
                 }
             }
