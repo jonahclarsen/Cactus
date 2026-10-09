@@ -66,6 +66,7 @@ app.whenReady().then(() => {
     for (const [shortcut, secondsDelta] of [
         ['Alt+Shift+A', -5 * 60],
         ['Alt+Shift+D', 5 * 60],
+        ['Alt+Shift+F', 60],
     ]) {
         const registered = globalShortcut.register(shortcut, () => {
             timerManager.extendTimer(secondsDelta);
