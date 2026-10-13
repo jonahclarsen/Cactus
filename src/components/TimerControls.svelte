@@ -54,18 +54,8 @@
         </button>
     </div>
 
-    <!-- Time-control row: +1m, -1m -->
+    <!-- Time-control row: -1m, +1m -->
     <div class="controls time-control">
-        <button
-            class="btn time-control-btn"
-            on:click={(e) => {
-                if (e.metaKey || e.ctrlKey) extendBy(5 * 60);
-                else extendBy(60);
-            }}
-            title="Increase time by 1 minute"
-        >
-            +
-        </button>
         <button
             class="btn time-control-btn"
             on:click={(e) => {
@@ -75,6 +65,16 @@
             title="Decrease time by 1 minute"
         >
             -
+        </button>
+        <button
+            class="btn time-control-btn"
+            on:click={(e) => {
+                if (e.metaKey || e.ctrlKey) extendBy(5 * 60);
+                else extendBy(60);
+            }}
+            title="Increase time by 1 minute"
+        >
+            +
         </button>
     </div>
     <div class="keyboard-instructions">
