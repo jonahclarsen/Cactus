@@ -1,16 +1,10 @@
 const { app } = require('electron');
 const path = require('path');
 const fs = require('fs');
-const ALERT_FONTS = require('../alert-fonts.json');
-
-const ALERT_FONT_KEYS = new Set(ALERT_FONTS.map((font) => font.id));
 
 const DEFAULT_SETTINGS = {
     theme: 'violet',
     traySymbol: 'cactus',
-    completionAlertFont: 'lucida-grande',
-    completionAlertWeight: 900,
-    completionAlertVerticalOffset: 0,
     acceptableHourRange: 6,
     durations: { workMinutes: 30, breakMinutes: 3 },
     soundVolume: 100, // Volume for timer end sound (0-100)
@@ -40,22 +34,6 @@ const THEME_KEYS = new Set([
 function normalizeThemeKey(themeKey) {
     const normalized = LEGACY_THEME_ALIASES[themeKey] || themeKey;
     return THEME_KEYS.has(normalized) ? normalized : DEFAULT_SETTINGS.theme;
-}
-
-function normalizeAlertFont(fontKey) {
-    return ALERT_FONT_KEYS.has(fontKey) ? fontKey : DEFAULT_SETTINGS.completionAlertFont;
-}
-
-function normalizeAlertWeight(weight) {
-    const numericWeight = Number(weight);
-    if (!Number.isFinite(numericWeight)) return DEFAULT_SETTINGS.completionAlertWeight;
-    return Math.min(1500, Math.max(100, Math.round(numericWeight / 100) * 100));
-}
-
-function normalizeAlertVerticalOffset(offset) {
-    const numericOffset = Number(offset);
-    if (!Number.isFinite(numericOffset)) return DEFAULT_SETTINGS.completionAlertVerticalOffset;
-    return Math.min(6, Math.max(-6, Math.round(numericOffset * 2) / 2));
 }
 
 const DEFAULT_STATE = {
@@ -132,11 +110,6 @@ class StateManager {
                     ...DEFAULT_SETTINGS,
                     ...json.settings,
                     theme: normalizeThemeKey(json.settings?.theme),
-                    completionAlertFont: normalizeAlertFont(json.settings?.completionAlertFont),
-                    completionAlertWeight: normalizeAlertWeight(json.settings?.completionAlertWeight),
-                    completionAlertVerticalOffset: normalizeAlertVerticalOffset(
-                        json.settings?.completionAlertVerticalOffset
-                    ),
                     durations: { ...DEFAULT_SETTINGS.durations, ...(json.settings?.durations || {}) }
                 };
                 this.state = {
@@ -183,16 +156,6 @@ class StateManager {
             ...this.settings,
             ...nextSettings,
             theme: normalizeThemeKey(nextSettings.theme ?? this.settings.theme),
-            completionAlertFont: normalizeAlertFont(
-                nextSettings.completionAlertFont ?? this.settings.completionAlertFont
-            ),
-            completionAlertWeight: normalizeAlertWeight(
-                nextSettings.completionAlertWeight ?? this.settings.completionAlertWeight
-            ),
-            completionAlertVerticalOffset: normalizeAlertVerticalOffset(
-                nextSettings.completionAlertVerticalOffset
-                    ?? this.settings.completionAlertVerticalOffset
-            ),
         };
 
         const newDir = this.getUserDir();

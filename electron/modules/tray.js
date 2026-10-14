@@ -3,37 +3,30 @@ const path = require('path');
 const fs = require('fs');
 const { createCanvas, GlobalFonts } = require('@napi-rs/canvas');
 const { drawTraySymbolPath } = require('./tray-symbols');
-const ALERT_FONTS = require('../alert-fonts.json');
 
-const ALERT_FONT_CONFIGS = new Map(ALERT_FONTS.map((font) => [font.id, font]));
 const ALERT_FONT_SIZE = 24;
-const REGISTERED_ALERT_FACES = new Map();
+const ALERT_FONT_FILENAME = 'PPPangramSansRounded-Bold.otf';
+const ALERT_FONT_FALLBACK_FAMILY = '"PP Pangram Sans Rounded", sans-serif';
+const ALERT_WEIGHT = 1000;
+const ALERT_VERTICAL_OFFSET = 2;
+let alertFont = null;
 
-function resolveAlertFont(fontId, weight) {
-    const font = ALERT_FONT_CONFIGS.get(fontId) || ALERT_FONT_CONFIGS.get('lucida-grande');
-    const faceFilename = font.canvasFaces?.[String(weight)];
-    if (!faceFilename) return { family: font.family, weight };
+function resolveAlertFont() {
+    if (alertFont) return alertFont;
 
-    const cacheKey = `${font.id}:${weight}`;
-    if (REGISTERED_ALERT_FACES.has(cacheKey)) {
-        return REGISTERED_ALERT_FACES.get(cacheKey);
-    }
-
-    const alias = `Cactus ${font.id} ${weight}`;
+    const alias = 'Cactus Pangram Rounded';
     const fontDirectories = [
         path.join(app.getPath('home'), 'Library', 'Fonts'),
         '/Library/Fonts',
         '/System/Library/Fonts',
     ];
     const facePath = fontDirectories
-        .map((directory) => path.join(directory, faceFilename))
+        .map((directory) => path.join(directory, ALERT_FONT_FILENAME))
         .find((candidate) => fs.existsSync(candidate));
-    const resolved = facePath && GlobalFonts.registerFromPath(facePath, alias)
+    alertFont = facePath && GlobalFonts.registerFromPath(facePath, alias)
         ? { family: `"${alias}"`, weight: 400 }
-        : { family: font.family, weight };
-
-    REGISTERED_ALERT_FACES.set(cacheKey, resolved);
-    return resolved;
+        : { family: ALERT_FONT_FALLBACK_FAMILY, weight: 900 };
+    return alertFont;
 }
 
 const THEME_PRIMARY_COLORS = {
@@ -175,22 +168,17 @@ class TrayManager {
 
             if (showZeroAlert) {
                 const alertX = cx + symbolSize / 2 + alertGap + alertWidth / 2;
-                const alertY = cy
-                    + (Number(this.settings.completionAlertVerticalOffset) || 0) * scale;
-                const alertWeight = this.settings.completionAlertWeight || 900;
-                const canvasWeight = Math.min(alertWeight, 900);
-                const alertFont = resolveAlertFont(this.settings.completionAlertFont, canvasWeight);
-                ctx.font = `${alertFont.weight} ${ALERT_FONT_SIZE * scale}px ${alertFont.family}`;
+                const alertY = cy + ALERT_VERTICAL_OFFSET * scale;
+                const font = resolveAlertFont();
+                ctx.font = `${font.weight} ${ALERT_FONT_SIZE * scale}px ${font.family}`;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 ctx.fillStyle = '#e34b4f';
-                const extraStrokeWidth = Math.max(0, (alertWeight - 900) / 100 * 0.5 * scale);
-                if (extraStrokeWidth > 0) {
-                    ctx.lineJoin = 'round';
-                    ctx.lineWidth = extraStrokeWidth;
-                    ctx.strokeStyle = '#e34b4f';
-                    ctx.strokeText('!', alertX, alertY);
-                }
+                const extraStrokeWidth = (ALERT_WEIGHT - 900) / 100 * 0.5 * scale;
+                ctx.lineJoin = 'round';
+                ctx.lineWidth = extraStrokeWidth;
+                ctx.strokeStyle = '#e34b4f';
+                ctx.strokeText('!', alertX, alertY);
                 ctx.fillText('!', alertX, alertY);
             }
 

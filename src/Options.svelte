@@ -1,7 +1,6 @@
 <script>
     import { createEventDispatcher, onMount } from "svelte";
     import { THEME_PALETTES, normalizeThemeKey } from "./themes.js";
-    import ALERT_FONTS from "../electron/alert-fonts.json";
     import "./button.css";
 
     export let editingSettings;
@@ -40,24 +39,6 @@
         }
     }
 
-    const ALERT_WEIGHT_LABELS = {
-        100: "Hairline",
-        200: "Extra Light",
-        300: "Light",
-        400: "Regular",
-        500: "Medium",
-        600: "Semibold",
-        700: "Bold",
-        800: "Extra Bold",
-        900: "Black",
-        1000: "Extra Black",
-        1100: "Heavy",
-        1200: "Extra Heavy",
-        1300: "Ultra",
-        1400: "Ultra Heavy",
-        1500: "Maximum",
-    };
-
     function persistOptions() {
         const snapshot = JSON.parse(JSON.stringify(editingSettings));
         api.saveSettings(snapshot).catch((error) => {
@@ -73,32 +54,6 @@
     function chooseTraySymbol(traySymbol) {
         editingSettings = { ...editingSettings, traySymbol };
         persistOptions();
-    }
-
-    function chooseCompletionAlertFont(completionAlertFont) {
-        editingSettings = { ...editingSettings, completionAlertFont };
-        persistOptions();
-    }
-
-    function updateCompletionAlertWeight(event) {
-        editingSettings = {
-            ...editingSettings,
-            completionAlertWeight: Number(event.currentTarget.value),
-        };
-        persistOptions();
-    }
-
-    function updateCompletionAlertVerticalOffset(event) {
-        editingSettings = {
-            ...editingSettings,
-            completionAlertVerticalOffset: Number(event.currentTarget.value),
-        };
-        persistOptions();
-    }
-
-    function formatVerticalOffset(offset) {
-        if (offset === 0) return "Centered";
-        return `${Math.abs(offset)} pt ${offset < 0 ? "up" : "down"}`;
     }
 
     function updateDuration(duration, event) {
@@ -135,27 +90,6 @@
     }
 
     $: activeTheme = normalizeThemeKey(editingSettings.theme);
-    $: activeAlertFont = ALERT_FONTS.some(
-        (font) => font.id === editingSettings.completionAlertFont,
-    )
-        ? editingSettings.completionAlertFont
-        : "lucida-grande";
-    $: activeAlertWeight = Math.min(
-        1500,
-        Math.max(
-            100,
-            Math.round((Number(editingSettings.completionAlertWeight) || 900) / 100) * 100,
-        ),
-    );
-    $: previewAlertWeight = Math.min(activeAlertWeight, 900);
-    $: previewAlertStrokeWidth = Math.max(0, (activeAlertWeight - 900) / 100 * 0.5);
-    $: activeAlertVerticalOffset = Math.min(
-        6,
-        Math.max(
-            -6,
-            Math.round((Number(editingSettings.completionAlertVerticalOffset) || 0) * 2) / 2,
-        ),
-    );
 </script>
 
 <svelte:window on:focus={refreshLoginSettings} />
@@ -273,65 +207,6 @@
                     <span class="choice-icon heart" aria-hidden="true">♥</span>
                     Heart
                 </button>
-            </div>
-        </div>
-
-        <div class="section">
-            <h3>Completion Alert Font</h3>
-            <div class="font-grid" role="group" aria-label="Completion alert font">
-                {#each ALERT_FONTS as font}
-                    <button
-                        type="button"
-                        class="font-option"
-                        class:active={activeAlertFont === font.id}
-                        aria-pressed={activeAlertFont === font.id}
-                        on:click={() => chooseCompletionAlertFont(font.id)}
-                    >
-                        <span
-                            class="font-preview"
-                            style={`font-family: ${font.family}; font-weight: ${previewAlertWeight}; -webkit-text-stroke: ${previewAlertStrokeWidth}px #e34b4f; transform: translateY(${activeAlertVerticalOffset}px)`}
-                            aria-hidden="true"
-                        >!</span>
-                        <span class="font-name">{font.name}</span>
-                        <span class="selected-mark" aria-hidden="true">✓</span>
-                    </button>
-                {/each}
-            </div>
-            <div class="font-weight-control">
-                <label for="completion-alert-weight">
-                    Weight: {ALERT_WEIGHT_LABELS[activeAlertWeight]} ({activeAlertWeight})
-                </label>
-                <input
-                    id="completion-alert-weight"
-                    type="range"
-                    min="100"
-                    max="1500"
-                    step="100"
-                    value={activeAlertWeight}
-                    on:input={updateCompletionAlertWeight}
-                />
-                <div class="range-extremes" aria-hidden="true">
-                    <span>100 · Hairline</span>
-                    <span>1500 · Maximum</span>
-                </div>
-            </div>
-            <div class="font-weight-control">
-                <label for="completion-alert-position">
-                    Vertical position: {formatVerticalOffset(activeAlertVerticalOffset)}
-                </label>
-                <input
-                    id="completion-alert-position"
-                    type="range"
-                    min="-6"
-                    max="6"
-                    step="0.5"
-                    value={activeAlertVerticalOffset}
-                    on:input={updateCompletionAlertVerticalOffset}
-                />
-                <div class="range-extremes" aria-hidden="true">
-                    <span>6 pt up</span>
-                    <span>6 pt down</span>
-                </div>
             </div>
         </div>
 
@@ -469,16 +344,14 @@
     }
 
     .theme-grid,
-    .choice-grid,
-    .font-grid {
+    .choice-grid {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 7px;
     }
 
     .theme-option,
-    .choice-option,
-    .font-option {
+    .choice-option {
         position: relative;
         min-width: 0;
         border: 2px solid var(--stroke);
@@ -490,22 +363,19 @@
     }
 
     .theme-option:hover,
-    .choice-option:hover,
-    .font-option:hover {
+    .choice-option:hover {
         border-color: color-mix(in srgb, var(--accent) 55%, var(--stroke));
         background: color-mix(in srgb, var(--surface) 94%, var(--accent));
     }
 
     .theme-option:focus-visible,
-    .choice-option:focus-visible,
-    .font-option:focus-visible {
+    .choice-option:focus-visible {
         outline: 3px solid color-mix(in srgb, var(--accent) 28%, transparent);
         outline-offset: 1px;
     }
 
     .theme-option.active,
-    .choice-option.active,
-    .font-option.active {
+    .choice-option.active {
         border-color: var(--accent);
         background: color-mix(in srgb, var(--surface) 88%, var(--accent));
         box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 16%, transparent);
@@ -566,8 +436,7 @@
         transition: opacity 140ms ease, transform 140ms ease;
     }
 
-    .theme-option.active .selected-mark,
-    .font-option.active .selected-mark {
+    .theme-option.active .selected-mark {
         opacity: 1;
         transform: scale(1);
     }
@@ -591,46 +460,6 @@
 
     .choice-icon.heart {
         color: var(--accent);
-    }
-
-    .font-option {
-        position: relative;
-        display: grid;
-        grid-template-columns: 28px minmax(0, 1fr);
-        align-items: center;
-        gap: 6px;
-        min-height: 43px;
-        padding: 6px 8px;
-        border-radius: 11px;
-        text-align: left;
-    }
-
-    .font-preview {
-        color: #e34b4f;
-        font-size: 24px;
-        font-weight: 900;
-        line-height: 1;
-        text-align: center;
-    }
-
-    .font-name {
-        overflow: hidden;
-        font-size: 10px;
-        font-weight: 700;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
-
-    .font-weight-control {
-        margin-top: 10px;
-    }
-
-    .range-extremes {
-        display: flex;
-        justify-content: space-between;
-        margin-top: 3px;
-        color: var(--muted);
-        font-size: 9px;
     }
 
     .field {
