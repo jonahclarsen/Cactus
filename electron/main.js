@@ -6,6 +6,7 @@ const { WindowManager } = require('./modules/window');
 const { TrayManager } = require('./modules/tray');
 const { SoundPlayer } = require('./modules/sound');
 const { setupIpcHandlers } = require('./modules/ipc-handlers');
+const { ShortcutManager } = require('./modules/shortcuts');
 
 const isDev = !app.isPackaged;
 const DEV_PORT = process.env.VITE_DEV_PORT || '5173';
@@ -40,9 +41,6 @@ app.whenReady().then(() => {
     timerManager.startTicking();
     timerManager.startMinuteTracking();
 
-    // Set up IPC communication
-    setupIpcHandlers(stateManager, timerManager, windowManager, trayManager);
-
     const startWorkIfNeeded = () => {
         // Preserve work sessions with time left, including paused sessions.
         if (!timerManager.state.timer.isBreak && timerManager.timeRemainingSeconds() > 0) {
@@ -52,29 +50,16 @@ app.whenReady().then(() => {
     };
     tray.on('right-click', startWorkIfNeeded);
 
-    const shortcut = 'Alt+Shift+S';
-    const registered = globalShortcut.register(shortcut, startWorkIfNeeded);
-    if (!registered) {
-        console.error(`Failed to register global shortcut: ${shortcut}`);
-    }
-
-    const toggleShortcut = 'Alt+Shift+X';
-    if (!globalShortcut.register(toggleShortcut, () => windowManager.toggleWindow())) {
-        console.error(`Failed to register global shortcut: ${toggleShortcut}`);
-    }
-
-    for (const [shortcut, secondsDelta] of [
-        ['Alt+Shift+A', -5 * 60],
-        ['Alt+Shift+D', 5 * 60],
-        ['Alt+Shift+F', 60],
-    ]) {
-        const registered = globalShortcut.register(shortcut, () => {
-            timerManager.extendTimer(secondsDelta);
-        });
-        if (!registered) {
-            console.error(`Failed to register global shortcut: ${shortcut}`);
-        }
-    }
+    const shortcutManager = new ShortcutManager(globalShortcut, {
+        subtractMinute: () => timerManager.extendTimer(-60),
+        addMinute: () => timerManager.extendTimer(60),
+        subtractFiveMinutes: () => timerManager.extendTimer(-300),
+        addFiveMinutes: () => timerManager.extendTimer(300),
+        startPomodoro: startWorkIfNeeded,
+        toggleWindow: () => windowManager.toggleWindow(),
+    });
+    shortcutManager.load(stateManager.settings.shortcuts);
+    setupIpcHandlers(stateManager, timerManager, windowManager, trayManager, shortcutManager);
 });
 
 app.on('window-all-closed', (e) => {

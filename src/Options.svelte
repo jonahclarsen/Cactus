@@ -10,6 +10,38 @@
     let loginSettings = null;
     let loginBusy = false;
     let loginError = "";
+    let shortcutError = "";
+    let shortcutBusy = false;
+    const shortcutActions = [
+        ["subtractMinute", "Subtract 1 minute"],
+        ["addMinute", "Add 1 minute"],
+        ["subtractFiveMinutes", "Subtract 5 minutes"],
+        ["addFiveMinutes", "Add 5 minutes"],
+        ["startPomodoro", "Start Pomodoro"],
+        ["toggleWindow", "Show / hide Cactus"],
+    ];
+
+    function displayShortcut(shortcut) {
+        return api.platform === "darwin" ? shortcut.replace(/\bAlt\b/g, "Option") : shortcut;
+    }
+
+    async function updateShortcut(action, event) {
+        const input = event.currentTarget;
+        const value = input.value;
+        shortcutBusy = true;
+        shortcutError = "";
+        try {
+            const result = await api.saveSettings({
+                shortcuts: { ...editingSettings.shortcuts, [action]: value },
+            });
+            editingSettings = { ...editingSettings, shortcuts: result.settings.shortcuts };
+        } catch (error) {
+            shortcutError = error.message.replace(/^Error invoking remote method '[^']+': (Error: )?/, "");
+        } finally {
+            input.value = displayShortcut(editingSettings.shortcuts[action]);
+            shortcutBusy = false;
+        }
+    }
 
     async function refreshLoginSettings() {
         if (loginBusy) return;
@@ -137,6 +169,35 @@
             </div>
         </div>
 
+        <div class="section">
+            <h3>Keyboard Shortcuts</h3>
+            <p class="startup-note shortcut-help" id="shortcut-help">
+                Type a combination such as {api.platform === "darwin" ? "Option+Shift+Q" : "Alt+Shift+Q"}.
+                Press Tab or click away to save. Leave blank to disable.
+            </p>
+            {#each shortcutActions as [action, label]}
+                <div class="field shortcut-field">
+                    <label for={`shortcut-${action}`}>{label}</label>
+                    <input
+                        id={`shortcut-${action}`}
+                        type="text"
+                        value={displayShortcut(editingSettings.shortcuts[action])}
+                        disabled={shortcutBusy}
+                        aria-describedby="shortcut-help"
+                        spellcheck="false"
+                        autocomplete="off"
+                        on:change={(event) => updateShortcut(action, event)}
+                        on:keydown={(event) => {
+                            if (event.key === "Enter") event.currentTarget.blur();
+                        }}
+                    />
+                </div>
+            {/each}
+            {#if shortcutError}
+                <p class="startup-note" role="alert">{shortcutError}</p>
+            {/if}
+        </div>
+
         {#if loginSettings?.supported}
             <div class="section">
                 <h3>Startup</h3>
@@ -240,6 +301,19 @@
 </div>
 
 <style>
+    .shortcut-help {
+        margin-bottom: 10px;
+        line-height: 1.4;
+    }
+
+    .shortcut-field {
+        margin: 8px 0;
+    }
+
+    .shortcut-field input {
+        font-size: 12px;
+    }
+
     .login-toggle {
         display: flex;
         align-items: center;

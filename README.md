@@ -57,12 +57,18 @@ I created this app because I couldn't find a Pomodoro solution I really liked - 
 ### Time Extensions
 
 Global shortcuts work while Cactus is running, even when its window is hidden:
-- **Alt+Shift+S**: Start a Pomodoro unless a work session already has time left
-- **Right-click the menu bar icon**: Same action as Alt+Shift+S
+- **Alt+Shift+Q**: Remove 1 minute from the timer
+- **Alt+Shift+W**: Add 1 minute to the timer
 - **Alt+Shift+A**: Remove 5 minutes from the timer
-- **Alt+Shift+D**: Add 5 minutes to the timer
-- **Alt+Shift+F**: Add 1 minute to the timer
+- **Alt+Shift+S**: Add 5 minutes to the timer
+- **Alt+Shift+Z**: Start a Pomodoro unless a work session already has time left
+- **Right-click the menu bar icon**: Same action as starting a Pomodoro
 - **Alt+Shift+X**: Show or hide the UI (Option+Shift+X on macOS)
+
+On macOS, Alt is Option. Customize any shortcut in Options → Keyboard Shortcuts
+by typing a combination such as `Option+Shift+Q`, then pressing Tab or clicking away.
+Changes apply immediately and are saved across restarts. Leave a field blank to
+disable that shortcut. Invalid or unavailable combinations keep the previous settings.
 
 Use the `+` and `-` buttons with modifiers:
 - **Normal click**: ±1 minute

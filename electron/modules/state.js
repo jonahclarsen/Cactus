@@ -1,8 +1,10 @@
 const { app } = require('electron');
 const path = require('path');
 const fs = require('fs');
+const { DEFAULT_SHORTCUTS } = require('./shortcuts');
 
 const DEFAULT_SETTINGS = {
+    shortcuts: { ...DEFAULT_SHORTCUTS },
     theme: 'violet',
     traySymbol: 'cactus',
     acceptableHourRange: 6,
@@ -110,6 +112,7 @@ class StateManager {
                     ...DEFAULT_SETTINGS,
                     ...json.settings,
                     theme: normalizeThemeKey(json.settings?.theme),
+                    shortcuts: { ...DEFAULT_SHORTCUTS, ...(json.settings?.shortcuts || {}) },
                     durations: { ...DEFAULT_SETTINGS.durations, ...(json.settings?.durations || {}) }
                 };
                 this.state = {

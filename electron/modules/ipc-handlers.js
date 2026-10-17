@@ -1,6 +1,6 @@
 const { app, ipcMain, shell } = require('electron');
 
-function setupIpcHandlers(stateManager, timerManager, windowManager, trayManager) {
+function setupIpcHandlers(stateManager, timerManager, windowManager, trayManager, shortcutManager) {
 
     function getPublicState() {
         return {
@@ -89,6 +89,12 @@ function setupIpcHandlers(stateManager, timerManager, windowManager, trayManager
     });
 
     ipcMain.handle('cactus:save-settings', (_e, nextSettings) => {
+        if (nextSettings.shortcuts) {
+            nextSettings = {
+                ...nextSettings,
+                shortcuts: shortcutManager.update(nextSettings.shortcuts),
+            };
+        }
         stateManager.updateSettings(nextSettings);
         notifyRenderer('state');
         trayManager.updateTrayTitleAndIcon();
