@@ -19,7 +19,7 @@ jobs:
         uses: actions/checkout@4
       
       - name: Setup pnpm
-        uses: pnpm-action-setup@v3
+        uses: pnpm/action-setup@v4
         with:
           version: 10.5.1
 
@@ -33,7 +33,7 @@ jobs:
           echo "${{ secrets.MACOS_CERTIFICATE }}" | base64 --decode > .certs/cert.p12
           echo "${{ secrets.APPLE_API_KEY }}" > .certs/AuthKey.p8
 
-      name: Build macOS (x64) signed and notarized, publish draft release
+      - name: Build macOS (x64) signed and notarized, publish draft release
         if: matrix.os == 'macos-latest'
         env:
           CSC_LINK: ${{ github.workspace }}/.certs/cert.p12

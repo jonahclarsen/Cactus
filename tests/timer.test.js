@@ -121,3 +121,15 @@ test('subtracting to zero notifies listeners when the timer ends', () => {
     assert.ok(timer.manager.state.lastEnded);
     assert.equal(ticks, 1);
 });
+
+test('Situate display overlays a pass without changing the underlying timer', () => {
+    const timer=createTimer();
+    timer.manager.situateUntil=160000;
+    assert.equal(timer.manager.displayRemainingSeconds(),60);
+    assert.equal(timer.manager.timeRemainingSeconds(),480);
+    timer.elapse(30000);
+    assert.equal(timer.manager.displayRemainingSeconds(),30);
+    assert.equal(timer.manager.timeRemainingSeconds(),450);
+    timer.manager.situateUntil=null;
+    assert.equal(timer.manager.displayRemainingSeconds(),450);
+});
