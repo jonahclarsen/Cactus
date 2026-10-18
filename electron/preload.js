@@ -11,6 +11,7 @@ contextBridge.exposeInMainWorld('cactus', {
     resume: () => ipcRenderer.invoke('cactus:resume'),
     extend: (seconds) => ipcRenderer.invoke('cactus:extend', seconds),
     saveSettings: (settings) => ipcRenderer.invoke('cactus:save-settings', settings),
+    openSituate: () => ipcRenderer.invoke('cactus:open-situate'),
     open: () => ipcRenderer.invoke('cactus:open'),
     openDataFolder: () => ipcRenderer.invoke('cactus:open-data-folder'),
     openGithub: () => ipcRenderer.invoke('cactus:open-github'),

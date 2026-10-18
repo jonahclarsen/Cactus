@@ -102,12 +102,13 @@
     {#if settings && state}
         <div class="main-content">
             <TimerDisplay {state} {crayon} />
-            <TimerControls {state} {api} bind:hasEnded />
+            {#if state.timer?.situateUntil}<button class="link" type="button" on:click={() => api.openSituate()}>Touch grass pass</button>{:else}<TimerControls {state} {api} bind:hasEnded />{/if}
             <div class="bottom-controls">
                 <button
                     type="button"
                     class="link"
                     on:click={togglePlayPause}
+                    disabled={Boolean(state.timer?.situateUntil)}
                 >
                     {#if state.timer?.running}
                         Pause Timer

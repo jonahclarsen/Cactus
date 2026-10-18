@@ -18,6 +18,10 @@ class TimerManager {
         return this.stateManager.settings;
     }
 
+    displayRemainingSeconds() {
+        return this.situateUntil ? Math.max(0, Math.ceil((this.situateUntil - Date.now()) / 1000)) : this.timeRemainingSeconds();
+    }
+
     timeRemainingSeconds() {
         if (!this.state.timer.running) return this.state.timer.remainingSeconds || 0;
         const rem = Math.max(0, Math.floor((this.state.timer.endTs - Date.now()) / 1000));

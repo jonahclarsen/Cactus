@@ -84,7 +84,7 @@ class TrayManager {
     updateTrayTitleAndIcon() {
         if (!this.tray) return;
 
-        const remainingSeconds = this.timerManager.timeRemainingSeconds();
+        const remainingSeconds = this.timerManager.displayRemainingSeconds();
         const minutesLeft = this.timerManager.secondsToMinutesFloor(remainingSeconds);
         const showZeroAlert = remainingSeconds <= 0 && Boolean(this.state.lastEnded);
         this.renderTrayImage(minutesLeft, showZeroAlert, () => { });
@@ -93,7 +93,7 @@ class TrayManager {
         const trayTitle = showZeroAlert ? '' : String(minutesLeft);
         try { this.tray.setTitle(trayTitle); } catch { }
 
-        this.tray.setToolTip(`Timer: ${minutesLeft} minutes remaining`);
+        this.tray.setToolTip(`${this.timerManager.situateUntil ? "Situate" : "Timer"}: ${minutesLeft} minutes remaining`);
     }
 
     renderTrayImage(minutesLeft, showZeroAlert, cb) {

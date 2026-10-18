@@ -6,6 +6,8 @@ const { WindowManager } = require('./modules/window');
 const { TrayManager } = require('./modules/tray');
 const { SoundPlayer } = require('./modules/sound');
 const { setupIpcHandlers } = require('./modules/ipc-handlers');
+const { SituateReader } = require('./modules/situate');
+const situateReader = new SituateReader();
 const { ShortcutManager } = require('./modules/shortcuts');
 
 const isDev = !app.isPackaged;
@@ -60,6 +62,7 @@ app.whenReady().then(() => {
     });
     shortcutManager.load(stateManager.settings.shortcuts);
     setupIpcHandlers(stateManager, timerManager, windowManager, trayManager, shortcutManager);
+    situateReader.start(until => { timerManager.situateUntil = until; timerManager.onTick?.(); });
 });
 
 app.on('window-all-closed', (e) => {
@@ -73,5 +76,6 @@ app.on('before-quit', () => {
     globalShortcut.unregisterAll();
     stateManager.stopAutoSave();
     timerManager.stop();
+    situateReader.stop();
     stateManager.saveData();
 });

@@ -7,7 +7,7 @@ function setupIpcHandlers(stateManager, timerManager, windowManager, trayManager
             settings: stateManager.settings,
             state: {
                 ...stateManager.state,
-                timer: { ...stateManager.state.timer, remainingSeconds: timerManager.timeRemainingSeconds() }
+                timer: { ...stateManager.state.timer, remainingSeconds: timerManager.displayRemainingSeconds(), situateUntil: timerManager.situateUntil || null }
             },
             computed: {}
         };
@@ -32,6 +32,7 @@ function setupIpcHandlers(stateManager, timerManager, windowManager, trayManager
     };
 
     // Register IPC handlers
+    ipcMain.handle('cactus:open-situate', () => shell.openExternal('balance://situate?mode=touch-grass&widget=1'));
     ipcMain.handle('cactus:get-state', () => getPublicState());
 
     // Read from macOS so changes made in System Settings stay authoritative.

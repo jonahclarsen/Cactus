@@ -1,0 +1,21 @@
+name: Situate and timer checks
+on:
+  push:
+    branches: [main, 'feat/situate']
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.5.1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: pnpm install --frozen-lockfile
+      - run: node --test
+      - run: pnpm build:renderer

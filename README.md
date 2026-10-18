@@ -109,3 +109,11 @@ The data includes:
 3. Make your changes
 4. Test thoroughly
 5. Submit a pull request
+
+## Balance Situate
+
+When Balance publishes a night pass to `~/.local/share/balance-situate/status.json`,
+Cactus shows its remaining time. It reads only this Situate status file; it cannot
+read planner data, extend a pass, or turn a mode off. The normal timer continues
+underneath and returns when the pass ends. Missing or stale status restores the
+normal timer. No shell hook or network service is needed.
