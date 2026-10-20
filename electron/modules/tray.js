@@ -158,13 +158,21 @@ class TrayManager {
 
                 // Fill from bottom to the calculated height
                 ctx.fillStyle = symbolColor;
-                ctx.globalAlpha = 0.8;
+                ctx.globalAlpha = 1;
                 ctx.fillRect(cx - symbolSize / 2, fillY, symbolSize, fillHeight);
 
                 // Restore context
                 ctx.restore();
                 ctx.globalAlpha = 1;
             }
+
+            // Keep the chosen color visible even before the progress fill rises.
+            // A translucent silhouette alone washes out against the menu bar.
+            drawTraySymbolPath(ctx, symbol, cx, cy, symbolSize, symbolHeight);
+            ctx.strokeStyle = symbolColor;
+            ctx.lineWidth = scale;
+            ctx.lineJoin = 'round';
+            ctx.stroke();
 
             if (showZeroAlert) {
                 const alertX = cx + symbolSize / 2 + alertGap + alertWidth / 2;
@@ -185,10 +193,9 @@ class TrayManager {
             // Convert to image buffer and create nativeImage
             const buffer = canvas.toBuffer('image/png');
             let img = nativeImage.createFromBuffer(buffer);
-            try { img.setTemplateImage(false); } catch { }
-
             // Resize for actual display size
             img = img.resize({ width: pointW, height: pointH, quality: 'best' });
+            img.setTemplateImage(false);
             this.tray.setImage(img);
         } catch (e) {
             console.error('Failed to render tray image:', e);
