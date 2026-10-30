@@ -116,4 +116,5 @@ When Balance publishes a night pass to `~/.local/share/balance-situate/status.js
 Cactus shows its remaining time. It reads only this Situate status file; it cannot
 read planner data, extend a pass, or turn a mode off. The normal timer continues
 underneath and returns when the pass ends. Missing or stale status restores the
-normal timer. No shell hook or network service is needed.
+normal timer. When Touch grass's 5-minute heads-up arrives, Cactus starts a
+5-minute timer. No shell hook or network service is needed.

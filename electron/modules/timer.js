@@ -103,9 +103,13 @@ class TimerManager {
         const minutes = isBreak ?
             (this.settings.durations.breakMinutes) :
             (this.settings.durations.workMinutes);
+        this.startTimerSeconds(minutes * 60, isBreak);
+    }
+
+    startTimerSeconds(seconds, isBreak = false) {
         this.state.timer.isBreak = !!isBreak;
         this.state.timer.running = true;
-        this.state.timer.remainingSeconds = Math.max(0, Math.floor(minutes * 60));
+        this.state.timer.remainingSeconds = Math.max(0, Math.floor(seconds));
         this.state.timer.initialSeconds = this.state.timer.remainingSeconds;
         this.state.timer.endTs = Date.now() + this.state.timer.remainingSeconds * 1000;
         this.state.lastEnded = null;

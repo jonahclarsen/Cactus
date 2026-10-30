@@ -62,7 +62,10 @@ app.whenReady().then(() => {
     });
     shortcutManager.load(stateManager.settings.shortcuts);
     setupIpcHandlers(stateManager, timerManager, windowManager, trayManager, shortcutManager);
-    situateReader.start(until => { timerManager.situateUntil = until; timerManager.onTick?.(); });
+    situateReader.start(
+        until => { timerManager.situateUntil = until; timerManager.onTick?.(); },
+        () => timerManager.startTimerSeconds(5 * 60),
+    );
 });
 
 app.on('window-all-closed', (e) => {

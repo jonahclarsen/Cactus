@@ -25,3 +25,19 @@ test('reader rejects public files, symlinks, malformed and oversized feeds', () 
         fs.unlinkSync(file);assert.equal(new SituateReader(file).read(),null);
     } finally { fs.rmSync(directory,{recursive:true,force:true}); }
 });
+
+test('the five-minute Touch grass heads-up starts a timer once, only when seen arriving', () => {
+    const fs = require('node:fs'); const os = require('node:os'); const path = require('node:path');
+    const { SituateReader } = require('../electron/modules/situate');
+    const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'cactus-situate-'));
+    const file = path.join(directory, 'status.json');
+    const feed = (soon, refreshAt = 10000) => fs.writeFileSync(file, JSON.stringify({version:1,enabled:true,aiBlocked:false,countdownUntil:null,refreshAt,modes:[{id:'dolo',soon:5},{id:'touch-grass',soon}]}), {mode:0o600});
+    try {
+        const reader = new SituateReader(file); let started = 0;
+        const poll = (now = 1000) => reader.poll(() => {}, () => started++, now);
+        feed(5); poll(); assert.equal(started, 0);
+        feed(null); poll(); feed(15); poll(); feed(15, 500); poll(); feed(5); poll(); assert.equal(started, 1);
+        poll(); feed(5, 500); poll(); feed(5); poll(); assert.equal(started, 1);
+        feed(null); poll(); feed(5); poll(); assert.equal(started, 2);
+    } finally { fs.rmSync(directory,{recursive:true,force:true}); }
+});
