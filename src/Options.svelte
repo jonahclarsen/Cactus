@@ -575,6 +575,14 @@
         cursor: pointer;
     }
 
+    input[type="range"]:focus {
+        outline: none;
+    }
+
+    input[type="range"]:focus-visible::-webkit-slider-thumb {
+        box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 40%, transparent);
+    }
+
     input[type="range"]::-webkit-slider-runnable-track {
         height: 7px;
         border: 1px solid var(--stroke);
