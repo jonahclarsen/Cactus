@@ -71,7 +71,13 @@
                         "x64"
                     ]
                 }
-            ]
+            ],
+            "signtoolOptions": {
+                "sign": "./scripts/sign-windows.js",
+                "signingHashAlgorithms": [
+                    "sha256"
+                ]
+            }
         },
         "linux": {
             "target": [
