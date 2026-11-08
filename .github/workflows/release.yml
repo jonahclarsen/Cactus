@@ -16,7 +16,7 @@ jobs:
       contents: write
     steps:
       - name: Checkout
-        uses: actions/checkout@4
+        uses: actions/checkout@v4
       
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -44,9 +44,34 @@ jobs:
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: pnpm run transpile:electron && pnpm run build:mac
 
+      - name: Set up .NET for Windows signing
+        if: runner.os == 'Windows' && startsWith(github.ref, 'refs/tags/')
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      # electron-builder calls scripts/sign-windows.js for Cactus.exe, the
+      # uninstaller and the installer; it runs this script on each file.
+      - name: Prepare Windows signing script
+        if: runner.os == 'Windows' && startsWith(github.ref, 'refs/tags/')
+        shell: powershell
+        env:
+          WINDOWS_SIGN_SCRIPT: ${{ secrets.WINDOWS_SIGN_SCRIPT }}
+        run: |
+          if (-not $env:WINDOWS_SIGN_SCRIPT) { throw "WINDOWS_SIGN_SCRIPT secret is missing" }
+          $script = Join-Path $env:RUNNER_TEMP "sign-windows.ps1"
+          [IO.File]::WriteAllBytes($script, [Convert]::FromBase64String($env:WINDOWS_SIGN_SCRIPT))
+          Select-String -Path $script -Pattern '^\s*\$env:AZURE_\w+\s*=\s*"([^"]+)"' | ForEach-Object { Write-Host "::add-mask::$($_.Matches[0].Groups[1].Value)" }
+          "WINDOWS_SIGN_SCRIPT_PATH=$script" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+
       - name: Build and publish (Windows)
         if: matrix.os == 'windows-latest'
         run: pnpm run transpile:electron && pnpm run build:win
+
+      - name: Remove Windows signing script
+        if: always() && runner.os == 'Windows'
+        shell: powershell
+        run: Remove-Item (Join-Path $env:RUNNER_TEMP "sign-windows.ps1") -Force -ErrorAction SilentlyContinue
 
       - name: Build and publish (Linux)
         if: matrix.os == 'ubuntu-latest'
